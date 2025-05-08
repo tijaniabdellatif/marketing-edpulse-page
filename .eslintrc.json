@@ -3,7 +3,7 @@
     "ignorePatterns": [
       "node_modules/", 
       ".next/", 
-      "src/app/generated/**", 
+      "src/generated/**", 
       "**/prisma/client/**", 
       "**/generated/**"
     ]

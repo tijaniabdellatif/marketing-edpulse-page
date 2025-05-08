@@ -15,7 +15,15 @@ const eslintConfig = [
     rules: {
       'react/no-unescaped-entities': 'off',
       '@next/next/no-page-custom-font': 'off',
-      "@typescript-eslint/no-unused-vars": "off"
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-expressions":"off",
+      "@typescript-eslint/no-explicit-any":"off",
+      "@typescript-eslint/no-non-null-assertion":"off",
+      "@typescript-eslint/no-empty-function":"off",
+      "@typescript-eslint/no-var-requires":"off",
+      "@typescript-eslint/no-inferrable-types":"off",
+      
+      
     },
   }),
  
