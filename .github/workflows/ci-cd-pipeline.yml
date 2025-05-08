@@ -9,12 +9,9 @@ on:
     branches:
       - master
       - main
-
-
       
 jobs:
-
-  lint: 
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
@@ -120,6 +117,9 @@ jobs:
         
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
+        
+      - name: Create .npmrc file with legacy-peer-deps
+        run: echo "legacy-peer-deps=true" > .npmrc
         
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
