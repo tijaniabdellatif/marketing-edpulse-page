@@ -14,14 +14,10 @@ const mulish = Mulish({
 
 export const metadata: Metadata = {
   title: "edpulse language learning",
-  description: "Edpulse language learning is an AI-powered website that keeps learners eager to explore it",
+  description:
+    "Edpulse language learning is an AI-powered website that keeps learners eager to explore it",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
-  keywords:[
-    "edpulse",
-    "learning",
-    "languages",
-    "english",
-  ]
+  keywords: ["edpulse", "learning", "languages", "english"],
 };
 
 export default function RootLayout({
@@ -31,9 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${raleway.variable} ${mulish.variable} antialiased`}
-      >
+      <body className={`${raleway.variable} ${mulish.variable} antialiased`}>
         {children}
       </body>
     </html>
