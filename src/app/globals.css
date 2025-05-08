@@ -58,103 +58,127 @@
   --card-foreground : oklch(0.145 0 0);
   --popover : oklch(1 0 0);
   --popover-foreground : oklch(0.145 0 0);
-  --primary : oklch(0.205 0 0);
-  --primary-foreground : oklch(0.985 0 0);
-  --secondary : oklch(0.97 0 0);
-  --secondary-foreground : oklch(0.205 0 0);
-  --muted : oklch(0.97 0 0);
-  --muted-foreground : oklch(0.556 0 0);
-  --accent : oklch(0.97 0 0);
-  --accent-foreground : oklch(0.205 0 0);
-  --destructive : oklch(0.577 0.245 27.325);
-  --border : oklch(0.922 0 0);
-  --input : oklch(0.922 0 0);
-  --ring : oklch(0.708 0 0);
-  --chart-1 : oklch(0.646 0.222 41.116);
-  --chart-2 : oklch(0.6 0.118 184.704);
-  --chart-3 : oklch(0.398 0.07 227.392);
-  --chart-4 : oklch(0.828 0.189 84.429);
-  --chart-5 : oklch(0.769 0.188 70.08);
-  --sidebar : oklch(0.985 0 0);
-  --sidebar-foreground : oklch(0.145 0 0);
-  --sidebar-primary : oklch(0.205 0 0);
-  --sidebar-primary-foreground : oklch(0.985 0 0);
-  --sidebar-accent : oklch(0.97 0 0);
-  --sidebar-accent-foreground : oklch(0.205 0 0);
-  --sidebar-border : oklch(0.922 0 0);
-  --sidebar-ring : oklch(0.708 0 0);
+  --primary : #26A69A; /* Teal from the design */
+  --primary-foreground : #FFFFFF;
+  --secondary : #1A445A; /* Dark blue from the design */
+  --secondary-foreground : #FFFFFF;
+  --muted : #f1f5f9; /* Slate-100 for muted backgrounds */
+  --muted-foreground : #78909C; /* Light text color from design */
+  --accent : #4DD0E1; /* Cyan/Light blue from design */
+  --accent-foreground : #263238; /* Dark text for contrast */
+  --destructive : #FF6B7A; /* Using coral for destructive */
+  --border : #CBD5E1; /* Light border color */
+  --input : #E2E8F0;
+  --ring : #94A3B8;
+  --chart-1 : #26A69A; /* Teal */
+  --chart-2 : #4DD0E1; /* Cyan */
+  --chart-3 : #FF6B7A; /* Coral */
+  --chart-4 : #FFD54F; /* Yellow */
+  --chart-5 : #9C62FF; /* Purple */
+  --sidebar : #0D2A39; /* Darker blue for sidebar */
+  --sidebar-foreground : #FFFFFF;
+  --sidebar-primary : #26A69A; /* Teal */
+  --sidebar-primary-foreground : #FFFFFF;
+  --sidebar-accent : #4DD0E1; /* Cyan */
+  --sidebar-accent-foreground : #0D2A39; /* Dark blue */
+  --sidebar-border : rgba(255, 255, 255, 0.1);
+  --sidebar-ring : rgba(255, 255, 255, 0.2);
 
-  /* Custom Colors */
-  --purple-primary: #977dff;
-  --blue-primary: #0033ff;
-  --blue-dark: #0600AE;
-  --blue-darker: #00033d;
-  --blue-ultra-dark: #0600ab;
-  --pink-light: #f2e6ee;
-  --pink-lighter: #ffccf2;
+  /* Updated Custom Colors based on design */
+  --teal-primary: #26A69A; /* Teal from the design */
+  --teal-light: #4DB6AC; /* Lighter teal variation */
+  --teal-dark: #00897B; /* Darker teal variation */
+  
+  --blue-primary: #1A445A; /* Dark blue from the design */
+  --blue-dark: #0D2A39; /* Darker blue (header) */
+  --blue-darker: #051E2C; /* Even darker variation */
+  --blue-light: #1A5F7A; /* Navy blue variation */
+  
+  --coral-primary: #FF6B7A; /* Coral for buttons */
+  --coral-light: #FF8A98; /* Lighter coral */
+  --coral-dark: #E63E50; /* Darker coral */
+  
+  --yellow-primary: #FFD54F; /* Yellow from the lightbulb */
+  --purple-primary: #9C62FF; /* Purple from illustrations */
+  --orange-primary: #FF9642; /* Orange from illustrations */
+  --mint-primary: #A5D6A7; /* Mint green from decorative elements */
 
-  --text-cozy-white: #f7f5f2; /* Warm, soft white with a hint of cream */
-  --text-matte-black: #2a2a2a; /* Soft, non-harsh black that's easier on the eyes */
+  /* Text colors from design */
+  --text-dark: #263238; /* Primary dark text */
+  --text-light: #78909C; /* Secondary light text */
+  --text-white: #FFFFFF; /* White text */
 
-  /* Custom Gradients */
-  --gradient-purple-pink: linear-gradient(to right, #977dff, #f2e6ee);
-  --gradient-blue-pink: linear-gradient(to right, #0033ff, #ffccf2);
-  --gradient-blue-purple: linear-gradient(to right, #0600AE, #0033ff, #977dff);
-  --gradient-dark-blue: linear-gradient(to right, #00033d, #0600ab, #0033ff);
-  --background : oklch(1 0 0);
-  --foreground : oklch(0.145 0 0);
+  /* Custom Gradients matching design colors */
+  --gradient-teal-blue: linear-gradient(to right, #26A69A, #1A445A);
+  --gradient-coral-yellow: linear-gradient(to right, #FF6B7A, #FFD54F);
+  --gradient-blue-teal: linear-gradient(to right, #0D2A39, #26A69A, #4DD0E1);
+  --gradient-purple-coral: linear-gradient(to right, #9C62FF, #FF6B7A);
+  --background : #FFFFFF;
+  --foreground : #263238; /* Main text color */
 }
 
 .dark {
-  --background : oklch(0.145 0 0);
-  --foreground : oklch(0.985 0 0);
-  --card : oklch(0.205 0 0);
-  --card-foreground : oklch(0.985 0 0);
-  --popover : oklch(0.205 0 0);
-  --popover-foreground : oklch(0.985 0 0);
-  --primary : oklch(0.922 0 0);
-  --primary-foreground : oklch(0.205 0 0);
-  --secondary : oklch(0.269 0 0);
-  --secondary-foreground : oklch(0.985 0 0);
-  --muted : oklch(0.269 0 0);
-  --muted-foreground : oklch(0.708 0 0);
-  --accent : oklch(0.269 0 0);
-  --accent-foreground : oklch(0.985 0 0);
-  --destructive : oklch(0.704 0.191 22.216);
-  --border : oklch(1 0 0 / 10%);
-  --input : oklch(1 0 0 / 15%);
-  --ring : oklch(0.556 0 0);
-  --chart-1 : oklch(0.488 0.243 264.376);
-  --chart-2 : oklch(0.696 0.17 162.48);
-  --chart-3 : oklch(0.769 0.188 70.08);
-  --chart-4 : oklch(0.627 0.265 303.9);
-  --chart-5 : oklch(0.645 0.246 16.439);
-  --sidebar : oklch(0.205 0 0);
-  --sidebar-foreground : oklch(0.985 0 0);
-  --sidebar-primary : oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground : oklch(0.985 0 0);
-  --sidebar-accent : oklch(0.269 0 0);
-  --sidebar-accent-foreground : oklch(0.985 0 0);
-  --sidebar-border : oklch(1 0 0 / 10%);
-  --sidebar-ring : oklch(0.556 0 0);
+  --background : #0D2A39; /* Darker blue for dark mode background */
+  --foreground : #FFFFFF;
+  --card : #1A445A; /* Dark blue */
+  --card-foreground : #FFFFFF;
+  --popover : #1A445A;
+  --popover-foreground : #FFFFFF;
+  --primary : #26A69A; /* Keeping teal as primary */
+  --primary-foreground : #FFFFFF;
+  --secondary : #1A5F7A; /* Slightly lighter blue for contrast */
+  --secondary-foreground : #FFFFFF;
+  --muted : rgba(255, 255, 255, 0.1);
+  --muted-foreground : rgba(255, 255, 255, 0.7);
+  --accent : #4DD0E1; /* Cyan */
+  --accent-foreground : #051E2C; /* Very dark blue */
+  --destructive : #FF6B7A; /* Coral */
+  --border : rgba(255, 255, 255, 0.15);
+  --input : rgba(255, 255, 255, 0.15);
+  --ring : rgba(255, 255, 255, 0.3);
+  --chart-1 : #26A69A; /* Teal */
+  --chart-2 : #4DD0E1; /* Cyan */
+  --chart-3 : #FF6B7A; /* Coral */
+  --chart-4 : #FFD54F; /* Yellow */
+  --chart-5 : #9C62FF; /* Purple */
+  --sidebar : #051E2C; /* Darkest blue */
+  --sidebar-foreground : #FFFFFF;
+  --sidebar-primary : #26A69A; /* Teal */
+  --sidebar-primary-foreground : #FFFFFF;
+  --sidebar-accent : #4DD0E1; /* Cyan */
+  --sidebar-accent-foreground : #FFFFFF;
+  --sidebar-border : rgba(255, 255, 255, 0.1);
+  --sidebar-ring : rgba(255, 255, 255, 0.2);
 
-  /* Custom Colors in Dark Mode - keep same as light mode for consistency */
-  --purple-primary: #977dff;
-  --blue-primary: #0033ff;
-  --blue-dark: #0600AE;
-  --blue-darker: #00033d;
-  --blue-ultra-dark: #0600ab;
-  --pink-light: #f2e6ee;
-  --pink-lighter: #ffccf2;
+  /* Custom Colors in Dark Mode */
+  --teal-primary: #26A69A;
+  --teal-light: #4DB6AC;
+  --teal-dark: #00897B;
+  
+  --blue-primary: #1A445A;
+  --blue-dark: #0D2A39;
+  --blue-darker: #051E2C;
+  --blue-light: #1A5F7A;
+  
+  --coral-primary: #FF6B7A;
+  --coral-light: #FF8A98;
+  --coral-dark: #E63E50;
+  
+  --yellow-primary: #FFD54F;
+  --purple-primary: #9C62FF;
+  --orange-primary: #FF9642;
+  --mint-primary: #A5D6A7;
 
-  --text-cozy-white: #f0ece6; /* Slightly warmer for dark mode */
-  --text-matte-black: #333333; /* Slightly lighter in dark mode */
+  /* Text colors in dark mode */
+  --text-dark: #E0E0E0;
+  --text-light: #B0BEC5;
+  --text-white: #FFFFFF;
 
-  /* Custom Gradients in Dark Mode */
-  --gradient-purple-pink: linear-gradient(to right, #977dff, #f2e6ee);
-  --gradient-blue-pink: linear-gradient(to right, #0033ff, #ffccf2);
-  --gradient-blue-purple: linear-gradient(to right, #0600AE, #0033ff, #977dff);
-  --gradient-dark-blue: linear-gradient(to right, #00033d, #0600ab, #0033ff);
+  /* Custom Gradients in Dark Mode - keeping same as light mode for consistency */
+  --gradient-teal-blue: linear-gradient(to right, #26A69A, #1A445A);
+  --gradient-coral-yellow: linear-gradient(to right, #FF6B7A, #FFD54F);
+  --gradient-blue-teal: linear-gradient(to right, #0D2A39, #26A69A, #4DD0E1);
+  --gradient-purple-coral: linear-gradient(to right, #9C62FF, #FF6B7A);
 }
 
 @layer base {
@@ -166,65 +190,69 @@
   }
 }
 
-.text-cozy-white {
-  color: var(--text-cozy-white);
+.text-dark {
+  color: var(--text-dark);
 }
 
-.text-matte-black {
-  color: var(--text-matte-black);
+.text-light {
+  color: var(--text-light);
+}
+
+.text-white {
+  color: var(--text-white);
 }
 
 /* Custom Gradient Background Utility Classes */
-.bg-gradient-purple-pink {
-  background: var(--gradient-purple-pink);
+.bg-gradient-teal-blue {
+  background: var(--gradient-teal-blue);
 }
 
-.bg-gradient-purple-pink, 
-.bg-gradient-blue-pink, 
-.bg-gradient-blue-purple, 
-.bg-gradient-dark-blue {
-  color: var(--text-cozy-white);
+.bg-gradient-teal-blue, 
+.bg-gradient-coral-yellow, 
+.bg-gradient-blue-teal, 
+.bg-gradient-purple-coral {
+  color: var(--text-white);
 }
 
-.bg-gradient-blue-pink {
-  background: var(--gradient-blue-pink);
+.bg-gradient-coral-yellow {
+  background: var(--gradient-coral-yellow);
 }
 
-.bg-gradient-blue-purple {
-  background: var(--gradient-blue-purple);
+.bg-gradient-blue-teal {
+  background: var(--gradient-blue-teal);
 }
 
-.bg-gradient-dark-blue {
-  background: var(--gradient-dark-blue);
+.bg-gradient-purple-coral {
+  background: var(--gradient-purple-coral);
 }
 
 /* Text with gradient background */
-.text-gradient-purple-pink {
-  background: var(--gradient-purple-pink);
+.text-gradient-teal-blue {
+  background: var(--gradient-teal-blue);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
 }
 
-.text-gradient-blue-pink {
-  background: var(--gradient-blue-pink);
+.text-gradient-coral-yellow {
+  background: var(--gradient-coral-yellow);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
 }
 
-.text-gradient-blue-purple {
-  background: var(--gradient-blue-purple);
+.text-gradient-blue-teal {
+  background: var(--gradient-blue-teal);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
 }
 
-.text-gradient-dark-blue {
-  background: var(--gradient-dark-blue);
+.text-gradient-purple-coral {
+  background: var(--gradient-purple-coral);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -232,108 +260,122 @@
 }
 
 /* Button gradient variants */
-.btn-gradient-purple-pink {
-  background: var(--gradient-purple-pink);
+.btn-gradient-teal-blue {
+  background: var(--gradient-teal-blue);
   color: white;
   border: none;
   position: relative;
   z-index: 1;
 }
 
-.btn-gradient-purple-pink:hover::before {
+.btn-gradient-teal-blue:hover::before {
   opacity: 1;
 }
 
-.btn-gradient-purple-pink::before {
+.btn-gradient-teal-blue::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to right, #8b6df7, #e5d1e0);
+  background: linear-gradient(to right, #00897B, #051E2C);
   border-radius: inherit;
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.btn-gradient-blue-pink {
-  background: var(--gradient-blue-pink);
+.btn-gradient-coral-yellow {
+  background: var(--gradient-coral-yellow);
   color: white;
   border: none;
   position: relative;
   z-index: 1;
 }
 
-.btn-gradient-blue-pink:hover::before {
+.btn-gradient-coral-yellow:hover::before {
   opacity: 1;
 }
 
-.btn-gradient-blue-pink::before {
+.btn-gradient-coral-yellow::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to right, #0029cc, #ffb3ec);
+  background: linear-gradient(to right, #E63E50, #FFC107);
   border-radius: inherit;
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.btn-gradient-blue-purple {
-  background: var(--gradient-blue-purple);
+.btn-gradient-blue-teal {
+  background: var(--gradient-blue-teal);
   color: white;
   border: none;
   position: relative;
   z-index: 1;
 }
 
-.btn-gradient-blue-purple:hover::before {
+.btn-gradient-blue-teal:hover::before {
   opacity: 1;
 }
 
-.btn-gradient-blue-purple::before {
+.btn-gradient-blue-teal::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to right, #050094, #0029cc, #8b6df7);
+  background: linear-gradient(to right, #051E2C, #00897B, #26C6DA);
   border-radius: inherit;
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.btn-gradient-dark-blue {
-  background: var(--gradient-dark-blue);
+.btn-gradient-purple-coral {
+  background: var(--gradient-purple-coral);
   color: white;
   border: none;
   position: relative;
   z-index: 1;
 }
 
-.btn-gradient-dark-blue:hover::before {
+.btn-gradient-purple-coral:hover::before {
   opacity: 1;
 }
 
-.btn-gradient-dark-blue::before {
+.btn-gradient-purple-coral::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to right, #00022d, #05008b, #0029cc);
+  background: linear-gradient(to right, #7E3FF2, #E63E50);
   border-radius: inherit;
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
+}
+
+/* CTA Button - Coral style from design */
+.btn-coral {
+  background: var(--coral-primary);
+  color: white;
+  border: none;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 14px rgba(255, 107, 122, 0.4);
+}
+
+.btn-coral:hover {
+  background: var(--coral-dark);
 }
 
 /* Animation for gradient backgrounds */
@@ -360,4 +402,46 @@
 .bg-gradient-animated {
   background-size: 200% 200%;
   animation: gradient-shift 5s ease infinite;
+}
+
+/* Background colors from design */
+.bg-blue-primary {
+  background-color: var(--blue-primary);
+}
+
+.bg-blue-dark {
+  background-color: var(--blue-dark);
+}
+
+.bg-teal-primary {
+  background-color: var(--teal-primary);
+}
+
+.bg-coral-primary {
+  background-color: var(--coral-primary);
+}
+
+.bg-yellow-primary {
+  background-color: var(--yellow-primary);
+}
+
+/* Text colors from design */
+.text-teal {
+  color: var(--teal-primary);
+}
+
+.text-coral {
+  color: var(--coral-primary);
+}
+
+.text-cyan {
+  color: var(--accent); /* Cyan */
+}
+
+.text-yellow {
+  color: var(--yellow-primary);
+}
+
+.text-purple {
+  color: var(--purple-primary);
 }

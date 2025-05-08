@@ -1,13 +1,27 @@
 "use client";
-import Image from "next/image";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Welcome } from "@/components/hoc/Welcome";
 
 export default function Home() {
+  const [showWelcome, setShowWelcome] = useState(true);
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <h1 className="font-raleway-sans text-matte-black text-3xl font-bold">
-        Releway the starting page ...
-      </h1>
-    </div>
+    <>
+         <AnimatePresence mode="wait">
+
+              {showWelcome && <Welcome onComplete={() => setShowWelcome(false)} />}
+              {!showWelcome && (
+                 <motion.div
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 transition={{ duration: 0.8, delay: 0.2 }}
+               >
+                <div>
+                  Hello world
+                </div>
+                </motion.div>
+              )}
+         </AnimatePresence>
+    </>
   );
 }
