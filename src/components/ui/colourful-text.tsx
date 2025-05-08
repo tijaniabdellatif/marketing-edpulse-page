@@ -5,11 +5,10 @@ import { cn } from "@/lib/utils";
  
 export function ColourfulText({ text ,className}: { text: string,className?:string }) {
   const colors = [
-    "text-dark",
-    "text-light",
-    "text-cyan",
-    "text-blue",
-    "text-coral"
+    "#263238",
+    "#FFFFFF",
+    "#78909C",
+    
   ];
  
   const [currentColors, setCurrentColors] = React.useState(colors);
