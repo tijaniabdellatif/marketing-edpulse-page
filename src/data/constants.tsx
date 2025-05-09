@@ -16,17 +16,15 @@ import {
   Compass
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/grid-skeleton';
-// Define type for a tab
+import { Avatar } from '@/components/ui/avatar';
+import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+
 export interface MagicTab {
   title: string;
   value: string;
   content?: React.ReactNode;
 }
 
-// Quiz tabs configuration
-
-
-// Define the Step interface with Lucide icon type
 export interface Step {
   icon: LucideIcon;
   title: string;
@@ -159,3 +157,113 @@ export const gridItems = [
     icon: <Compass className="h-4 w-4 text-[#00897B]" />,
   },
 ];
+
+export const testimonials = [
+  {
+    name: "Sarah Johnson",
+    text: "This platform completely changed how I work. The interface is clean, and the support team is incredibly responsive!",
+    username: "@sarahj",
+    image: Avatar
+  },
+  {
+    name: "Daniel Lee",
+    text: "Amazing experience! Everything just works out of the box and helped me boost my productivity.",
+    username: "@daniellee",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Fatima Zahra",
+    text: "I love how intuitive and user-friendly the platform is. It made a big difference for my small business.",
+    username: "@fatimazahra",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "James Carter",
+    text: "Reliable, fast, and easy to use. Highly recommend it to anyone looking for a modern solution.",
+    username: "@jamescarter",
+   image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Linda Nguyen",
+    text: "Excellent value and outstanding customer service. I felt supported every step of the way.",
+    username: "@lindanguyen",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Carlos Rivera",
+    text: "Their attention to detail and care for the user experience is unmatched. I'm a fan for life!",
+    username: "@carlosr",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Emily Chen",
+    text: "The onboarding was super smooth and quick. I was up and running in no time!",
+    username: "@emchen",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Mohamed El Amrani",
+    text: "What I appreciate most is the team's willingness to listen to feedback and constantly improve.",
+    username: "@moamrani",
+   image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Isabelle Martin",
+    text: "The clean UI and seamless workflow have been a game-changer for my projects.",
+    username: "@isabelle.m",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Ali Khan",
+    text: "I’ve tried many tools before, but none offered the balance of power and simplicity like this one.",
+    username: "@alikhan",
+   image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Nina Petrova",
+    text: "This platform helps me stay organized and focused every single day. Love it!",
+    username: "@ninap",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  },
+  {
+    name: "Tom Becker",
+    text: "Every update brings something new and useful. The team really listens to what users need.",
+    username: "@tbecker",
+    image: <Avatar>
+      <AvatarImage src="/avatar.png" alt="avatar" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  }
+];
+
+export type TestimonialsType = typeof testimonials;
