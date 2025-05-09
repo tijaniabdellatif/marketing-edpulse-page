@@ -1,7 +1,6 @@
 "use client";
 import { BackGroundBeams } from "../ui/background-beams";
 import { MagicTab } from "../ui/magic-tab";
-import { magicTabs } from "@/data/constants";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getVisitorId, saveVisitorId } from '@/lib/utils';
