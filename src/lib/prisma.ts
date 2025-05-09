@@ -1,15 +1,50 @@
+// lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
 
-// PrismaClient is attached to the `global` object in development to prevent
-// exhausting your database connection limit.
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// Prevent multiple instances of Prisma Client in development
+declare global {
+  var prisma: PrismaClient | undefined;
+}
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
-  });
+// PrismaClient initialization with better error handling
+export const prisma = global.prisma || new PrismaClient({
+  log: process.env.NODE_ENV === 'development' 
+    ? ['query', 'error', 'warn'] 
+    : ['error'],
+  errorFormat: 'pretty',
+});
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+// Add connection retry logic for better resilience
+async function connectWithRetry(retries = 5, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await prisma.$connect();
+      console.log('Successfully connected to database');
+      return;
+    } catch (error) {
+      console.error(`Database connection attempt ${i + 1} failed:`, error);
+      
+      if (i < retries - 1) {
+        console.log(`Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 1.5; // Exponential backoff
+      } else {
+        console.error('Max retries reached. Could not connect to database.');
+        throw error;
+      }
+    }
+  }
+}
+
+// Initialize connection
+if (process.env.NODE_ENV === 'production') {
+  connectWithRetry()
+    .catch(e => {
+      console.error('Fatal database connection error:', e);
+    });
+}
+
+// Prevent multiple instances in development
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 
 export default prisma;

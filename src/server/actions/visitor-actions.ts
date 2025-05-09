@@ -14,8 +14,27 @@ import {
 } from '@/lib/validator/visitor-schema';
 import { getClientIp } from '@/lib/utils';
 
+// Verify environment variables are set
+const checkEnvVariables = () => {
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is not set');
+    return false;
+  }
+  return true;
+};
 
 export async function createVisitor(prevState: any, formData: FormData) {
+  // Log start of function
+  console.log('Starting createVisitor server action');
+  
+  // Check environment variables first
+  if (!checkEnvVariables()) {
+    return {
+      success: false,
+      message: 'Server configuration error. Please contact support.'
+    };
+  }
+  
   try {
     // Extract form data
     const values = {
@@ -26,6 +45,16 @@ export async function createVisitor(prevState: any, formData: FormData) {
       occupation: formData.get('occupation') as string,
       bio: formData.get('bio') as string || undefined,
     };
+    
+    // Log extracted data (without sensitive info)
+    console.log('Form data extracted:', { 
+      firstName: values.firstName,
+      lastName: values.lastName,
+      hasEmail: !!values.email,
+      age: values.age,
+      occupation: values.occupation,
+      hasBio: !!values.bio
+    });
     
     // Extract tracking data
     const trackingData: VisitorTrackingData = {
@@ -42,10 +71,15 @@ export async function createVisitor(prevState: any, formData: FormData) {
       currentLevel: 'A1' as const, // Default level
     };
 
+    // Log validation attempt
+    console.log('Attempting to validate data...');
+    
     // Validate with your schema
     const validatedData = visitorFormSchema.merge(visitorTrackingSchema).parse(dataToValidate);
+    console.log('Data validation successful');
     
     // Check if visitor exists with this email
+    console.log('Checking if visitor exists with email:', values.email);
     const existingVisitor = await prisma.visitor.findFirst({
       where: { email: validatedData.email }
     });
@@ -54,6 +88,7 @@ export async function createVisitor(prevState: any, formData: FormData) {
     
     // Update existing visitor or create new one
     if (existingVisitor) {
+      console.log('Existing visitor found, updating record:', existingVisitor.id);
       visitor = await prisma.visitor.update({
         where: { id: existingVisitor.id },
         data: {
@@ -65,7 +100,9 @@ export async function createVisitor(prevState: any, formData: FormData) {
           ...(validatedData.bio && { bio: validatedData.bio }),
         }
       });
+      console.log('Visitor updated successfully');
     } else {
+      console.log('No existing visitor found, creating new record');
       // Create new visitor
       visitor = await prisma.visitor.create({
         data: {
@@ -78,8 +115,10 @@ export async function createVisitor(prevState: any, formData: FormData) {
           currentLevel: 'A1',
         }
       });
+      console.log('Visitor created successfully, ID:', visitor.id);
       
       // Create initial session
+      console.log('Creating initial session for visitor');
       const now = new Date(); // Only create the Date object once we need it
       await prisma.session.create({
         data: {
@@ -89,6 +128,7 @@ export async function createVisitor(prevState: any, formData: FormData) {
           startTime: now // Use Date object directly in the Prisma call
         }
       });
+      console.log('Session created successfully');
     }
 
     revalidatePath('/');
@@ -99,8 +139,15 @@ export async function createVisitor(prevState: any, formData: FormData) {
       visitorId: visitor.id
     };
     
-  } catch (error:any) {
-    console.error('Error in createVisitor:', error);
+  } catch (error: any) {
+    // Enhanced error logging with detailed information
+    console.error('Error in createVisitor:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      name: error.name,
+      meta: error.meta,
+    });
     
     // Handle Zod validation errors
     if (error.errors) {
@@ -127,19 +174,37 @@ export async function createVisitor(prevState: any, formData: FormData) {
       };
     }
     
+    // Handle database connection errors
+    if (error.code === 'P1001' || error.code === 'P1002') {
+      return {
+        success: false,
+        message: 'Unable to connect to the database. Please try again later.',
+        errorCode: error.code
+      };
+    }
+    
+    // Return more details in development
     return {
       success: false,
-      message: 'Something went wrong. Please try again.'
+      message: process.env.NODE_ENV === 'production' 
+        ? 'Something went wrong. Please try again.' 
+        : `Error: ${error.message}`,
+      errorDetails: process.env.NODE_ENV !== 'production' ? error : undefined
     };
   }
 }
 
 export async function updateVisitorBio(prevState: any, formData: FormData) {
+  console.log('Starting updateVisitorBio server action');
+  
   try {
     const visitorId = formData.get('visitorId') as string;
     const bio = formData.get('bio') as string;
     
+    console.log('Updating bio for visitor:', visitorId);
+    
     if (!visitorId) {
+      console.error('No visitor ID provided');
       return {
         success: false,
         message: 'No visitor ID provided. Please complete step 1 first.'
@@ -147,10 +212,12 @@ export async function updateVisitorBio(prevState: any, formData: FormData) {
     }
     
     // Validate bio using the schema
+    console.log('Validating bio...');
     const bioUpdate = { bio };
     const validation = visitorFormSchema.partial().safeParse(bioUpdate);
     
     if (!validation.success) {
+      console.error('Bio validation failed:', validation.error);
       return {
         success: false,
         message: 'Please enter a valid bio.',
@@ -159,11 +226,13 @@ export async function updateVisitorBio(prevState: any, formData: FormData) {
     }
     
     // Update visitor with bio
+    console.log('Validation successful, updating visitor');
     const visitor = await prisma.visitor.update({
       where: { id: visitorId },
       data: { bio }
     });
     
+    console.log('Bio updated successfully');
     revalidatePath('/');
     
     return {
@@ -172,12 +241,39 @@ export async function updateVisitorBio(prevState: any, formData: FormData) {
       visitorId: visitor.id
     };
     
-  } catch (error) {
-    console.error('Error updating bio:', error);
+  } catch (error: any) {
+    console.error('Error updating bio:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      name: error.name,
+      meta: error.meta,
+    });
+    
+    // Handle database connection errors
+    if (error.code === 'P1001' || error.code === 'P1002') {
+      return {
+        success: false,
+        message: 'Unable to connect to the database. Please try again later.',
+        errorCode: error.code
+      };
+    }
+    
+    // Handle record not found
+    if (error.code === 'P2025') {
+      return {
+        success: false,
+        message: 'Visitor not found. Please try again.',
+        errorCode: error.code
+      };
+    }
     
     return {
       success: false,
-      message: 'Something went wrong while saving your bio. Please try again.'
+      message: process.env.NODE_ENV === 'production' 
+        ? 'Something went wrong while saving your bio. Please try again.' 
+        : `Error: ${error.message}`,
+      errorDetails: process.env.NODE_ENV !== 'production' ? error : undefined
     };
   }
 }
@@ -186,8 +282,11 @@ export async function updateVisitorBio(prevState: any, formData: FormData) {
  * Start a new session for a visitor
  */
 export async function startSession(visitorId: string, trackingData: VisitorTrackingData) {
+  console.log('Starting new session for visitor:', visitorId);
+  
   try {
     if (!visitorId) {
+      console.error('No visitor ID provided');
       return {
         success: false,
         message: 'No visitor ID provided.'
@@ -195,8 +294,10 @@ export async function startSession(visitorId: string, trackingData: VisitorTrack
     }
     
     // Validate tracking data
+    console.log('Validating tracking data');
     const validation = visitorTrackingSchema.safeParse(trackingData);
     if (!validation.success) {
+      console.error('Tracking data validation failed:', validation.error);
       return {
         success: false,
         message: 'Invalid tracking data.'
@@ -204,6 +305,7 @@ export async function startSession(visitorId: string, trackingData: VisitorTrack
     }
     
     // Create a new session with validated data
+    console.log('Validation successful, creating session');
     const now = new Date();
     const session = await prisma.session.create({
       data: {
@@ -214,15 +316,25 @@ export async function startSession(visitorId: string, trackingData: VisitorTrack
       }
     });
     
+    console.log('Session created successfully:', session.id);
     return {
       success: true,
       sessionId: session.id
     };
-  } catch (error) {
-    console.error('Error starting session:', error);
+  } catch (error: any) {
+    console.error('Error starting session:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      name: error.name,
+      meta: error.meta,
+    });
+    
     return {
       success: false,
-      message: 'Failed to start session'
+      message: process.env.NODE_ENV === 'production' 
+        ? 'Failed to start session' 
+        : `Error: ${error.message}`
     };
   }
 }
@@ -231,13 +343,17 @@ export async function startSession(visitorId: string, trackingData: VisitorTrack
  * End a session and calculate duration
  */
 export async function endSession(sessionId: string) {
+  console.log('Ending session:', sessionId);
+  
   try {
     // Find the session
+    console.log('Finding session in database');
     const session = await prisma.session.findUnique({
       where: { id: sessionId }
     });
     
     if (!session) {
+      console.error('Session not found');
       return {
         success: false,
         message: 'Session not found'
@@ -245,11 +361,13 @@ export async function endSession(sessionId: string) {
     }
     
     // Calculate duration
+    console.log('Session found, calculating duration');
     const endTime = new Date();
     const startTime = session.startTime;
     const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000); // in seconds
     
     // Update session
+    console.log('Updating session with end time and duration');
     await prisma.session.update({
       where: { id: sessionId },
       data: {
@@ -258,15 +376,25 @@ export async function endSession(sessionId: string) {
       }
     });
     
+    console.log('Session ended successfully, duration:', duration);
     return {
       success: true,
       duration
     };
-  } catch (error) {
-    console.error('Error ending session:', error);
+  } catch (error: any) {
+    console.error('Error ending session:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      name: error.name,
+      meta: error.meta,
+    });
+    
     return {
       success: false,
-      message: 'Failed to end session'
+      message: process.env.NODE_ENV === 'production' 
+        ? 'Failed to end session' 
+        : `Error: ${error.message}`
     };
   }
 }
@@ -275,8 +403,11 @@ export async function endSession(sessionId: string) {
  * Skip the quiz and go directly to dashboard
  */
 export async function skipToQuiz(visitorId: string) {
+  console.log('Skip to quiz requested for visitor:', visitorId);
+  
   try {
     if (!visitorId) {
+      console.error('No visitor ID provided');
       return {
         success: false,
         message: 'No visitor ID provided.'
@@ -284,6 +415,7 @@ export async function skipToQuiz(visitorId: string) {
     }
     
     // Record that the visitor skipped
+    console.log('Recording skip action in database');
     await prisma.visitor.update({
       where: { id: visitorId },
       data: {
@@ -291,14 +423,24 @@ export async function skipToQuiz(visitorId: string) {
       }
     });
     
+    console.log('Skip recorded successfully, redirecting to dashboard');
     // Redirect to dashboard
     redirect('/dashboard');
     
-  } catch (error) {
-    console.error('Error skipping quiz:', error);
+  } catch (error: any) {
+    console.error('Error skipping quiz:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      name: error.name,
+      meta: error.meta,
+    });
+    
     return {
       success: false,
-      message: 'Failed to skip to quiz'
+      message: process.env.NODE_ENV === 'production' 
+        ? 'Failed to skip quiz' 
+        : `Error: ${error.message}`
     };
   }
 }

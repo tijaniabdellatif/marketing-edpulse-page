@@ -8,5 +8,16 @@
           "installCommand": "npm install --legacy-peer-deps"
         }
       }
-    ]
+    ],
+    "functions": {
+    "src/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "src/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "crons": []
   }
