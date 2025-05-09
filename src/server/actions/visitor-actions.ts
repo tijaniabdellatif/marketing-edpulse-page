@@ -14,27 +14,8 @@ import {
 } from '@/lib/validator/visitor-schema';
 import { getClientIp } from '@/lib/utils';
 
-// Verify environment variables are set
-const checkEnvVariables = () => {
-  if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL environment variable is not set');
-    return false;
-  }
-  return true;
-};
-
 export async function createVisitor(prevState: any, formData: FormData) {
-  // Log start of function
-  console.log('Starting createVisitor server action');
-  
-  // Check environment variables first
-  if (!checkEnvVariables()) {
-    return {
-      success: false,
-      message: 'Server configuration error. Please contact support.'
-    };
-  }
-  
+
   try {
     // Extract form data
     const values = {
