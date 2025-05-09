@@ -1,51 +1,89 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // You can change this to mysql, sqlite, etc.
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
+// Enum for occupation types
+enum Occupation {
+  STUDENT
+  EMPLOYEE
+  FREELANCER
+  FREE_OF_FUNCTION // Unemployed/Not currently working
+}
 
-model User {
-  id          String    @id @default(cuid())
-  email       String    @unique
-  firstName   String
-  lastName    String
-  displayName String?
-  dateOfBirth DateTime?
-
+// Visitor model to track users without authentication
+model Visitor {
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions Session[]
+  // Personal information
+  firstName  String?
+  lastName   String?
+  email      String?
+  age        Int?
+  bio        String?
+  occupation Occupation?
 
-  @@map("users")
+  // Tracking information
+  // Optional browser fingerprint for better tracking
+  sessions     Session[] // One visitor can have multiple sessions
+  // One visitor can take multiple quizzes
+
+  // Current proficiency level based on quiz results
+  currentLevel LanguageLevel? @default(A1)
+
+  @@index([email])
+ 
 }
 
+// Session model to track visitor engagement
 model Session {
-  id        String    @id @default(cuid())
-  userId    String
-  ipAddress String?
-  userAgent String?
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   startTime DateTime  @default(now())
   endTime   DateTime?
-  duration  Int?
-  active    Boolean
+  duration  Int? // Duration in seconds, calculated when session ends
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  // Session metadata
+  ipAddress   String?
+  userAgent   String?
+  referrer    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
 
-  @@index([userId])
-  @@map("sessions")
+  // Relation to visitor
+  visitorId String
+  visitor   Visitor @relation(fields: [visitorId], references: [id])
+
+  @@index([visitorId])
+  @@index([startTime])
+}
+
+// Quiz model to store different types of quizzes
+
+// Enum for language proficiency levels
+enum LanguageLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+// Enum for question difficulty
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
 }
