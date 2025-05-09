@@ -70,7 +70,7 @@ export const MagicTab = ({
     <>
       <div
         className={cn(
-          "flex flex-row items-center justify-center my-10 relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full",
+          "flex flex-row items-center justify-center py-5 relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full",
           containerClassName
         )}
       >

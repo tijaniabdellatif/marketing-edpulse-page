@@ -134,3 +134,171 @@ export async function createVisitor(prevState: any, formData: FormData) {
   }
 }
 
+export async function updateVisitorBio(prevState: any, formData: FormData) {
+  try {
+    const visitorId = formData.get('visitorId') as string;
+    const bio = formData.get('bio') as string;
+    
+    if (!visitorId) {
+      return {
+        success: false,
+        message: 'No visitor ID provided. Please complete step 1 first.'
+      };
+    }
+    
+    // Validate bio using the schema
+    const bioUpdate = { bio };
+    const validation = visitorFormSchema.partial().safeParse(bioUpdate);
+    
+    if (!validation.success) {
+      return {
+        success: false,
+        message: 'Please enter a valid bio.',
+        errors: { bio: ['Bio validation failed.'] }
+      };
+    }
+    
+    // Update visitor with bio
+    const visitor = await prisma.visitor.update({
+      where: { id: visitorId },
+      data: { bio }
+    });
+    
+    revalidatePath('/');
+    
+    return {
+      success: true,
+      message: 'Your bio has been saved.',
+      visitorId: visitor.id
+    };
+    
+  } catch (error) {
+    console.error('Error updating bio:', error);
+    
+    return {
+      success: false,
+      message: 'Something went wrong while saving your bio. Please try again.'
+    };
+  }
+}
+
+/**
+ * Start a new session for a visitor
+ */
+export async function startSession(visitorId: string, trackingData: VisitorTrackingData) {
+  try {
+    if (!visitorId) {
+      return {
+        success: false,
+        message: 'No visitor ID provided.'
+      };
+    }
+    
+    // Validate tracking data
+    const validation = visitorTrackingSchema.safeParse(trackingData);
+    if (!validation.success) {
+      return {
+        success: false,
+        message: 'Invalid tracking data.'
+      };
+    }
+    
+    // Create a new session with validated data
+    const now = new Date();
+    const session = await prisma.session.create({
+      data: {
+        visitorId,
+        ipAddress: trackingData.ipAddress || null,
+        userAgent: trackingData.userAgent || null,
+        startTime: now
+      }
+    });
+    
+    return {
+      success: true,
+      sessionId: session.id
+    };
+  } catch (error) {
+    console.error('Error starting session:', error);
+    return {
+      success: false,
+      message: 'Failed to start session'
+    };
+  }
+}
+
+/**
+ * End a session and calculate duration
+ */
+export async function endSession(sessionId: string) {
+  try {
+    // Find the session
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId }
+    });
+    
+    if (!session) {
+      return {
+        success: false,
+        message: 'Session not found'
+      };
+    }
+    
+    // Calculate duration
+    const endTime = new Date();
+    const startTime = session.startTime;
+    const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000); // in seconds
+    
+    // Update session
+    await prisma.session.update({
+      where: { id: sessionId },
+      data: {
+        endTime,
+        duration
+      }
+    });
+    
+    return {
+      success: true,
+      duration
+    };
+  } catch (error) {
+    console.error('Error ending session:', error);
+    return {
+      success: false,
+      message: 'Failed to end session'
+    };
+  }
+}
+
+/**
+ * Skip the quiz and go directly to dashboard
+ */
+export async function skipToQuiz(visitorId: string) {
+  try {
+    if (!visitorId) {
+      return {
+        success: false,
+        message: 'No visitor ID provided.'
+      };
+    }
+    
+    // Record that the visitor skipped
+    await prisma.visitor.update({
+      where: { id: visitorId },
+      data: {
+        // Any data to record when skipping
+      }
+    });
+    
+    // Redirect to dashboard
+    redirect('/dashboard');
+    
+  } catch (error) {
+    console.error('Error skipping quiz:', error);
+    return {
+      success: false,
+      message: 'Failed to skip to quiz'
+    };
+  }
+}

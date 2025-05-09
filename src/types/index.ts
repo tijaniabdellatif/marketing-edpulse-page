@@ -16,3 +16,9 @@ export interface  BackgroundBeamsProps {
   children: React.ReactNode;
   className?: string;
 }
+
+export interface BioFormProps {
+  visitorId: string;
+  onComplete: () => void;
+  onSkip: () => void;
+}

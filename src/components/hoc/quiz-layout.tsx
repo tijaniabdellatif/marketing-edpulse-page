@@ -1,6 +1,7 @@
 "use client";
 import { BackGroundBeams } from "../ui/background-beams";
 import { MagicTab } from "../ui/magic-tab";
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getVisitorId, saveVisitorId } from '@/lib/utils';
@@ -8,6 +9,7 @@ import { PersonalInfoForm } from '@/components/hoc/personal-information';
 import { ITab } from "@/types";
 import { TabContentWrapper } from "./tab-content-wrapper";
 import { motion } from 'framer-motion';
+import { BioForm } from "./bio-form";
 
 export default function QuizLayout() {
 
@@ -38,9 +40,27 @@ export default function QuizLayout() {
                 value: "about-yourself",
                 content: (
                     <TabContentWrapper title="Tell us more about your learning goals">
-                        <h1>Bio form</h1>
+                        <BioForm
+                            visitorId={visitorId}
+                            onComplete={handleBioComplete}
+                            onSkip={handleSkipStep}
+                        />
                     </TabContentWrapper>
                 ),
+
+                
+            },
+
+            {
+                title: "Quiz Start",
+                value: "Start",
+                content: (
+                    <TabContentWrapper title="Tell us more about your learning goals">
+                        start
+                    </TabContentWrapper>
+                ),
+
+                
             }
         ];
 
@@ -91,65 +111,65 @@ export default function QuizLayout() {
     };
 
     return (
-       <main className="relative h-[50rem] z-50">
-         <BackGroundBeams>
-            <div className="h-[40rem] md:h-[60rem] [perspective:1000px] relative flex flex-col max-w-6xl mx-auto w-full items-start justify-start">
-                <div className="mt-4">
-                    <h2 className="text-2xl py-5 relative z-20 md:text-4xl lg:text-7xl font-bold text-center text-black dark:text-white font-sans tracking-tight">
-                        What's brighter than your future?{" "}
-                        <div className="relative mx-auto  inline-block w-max [filter:drop-shadow(0px_1px_3px_rgba(27,_37,_80,_0.14))]">
-                            <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-teal-primary via-blue-primary to-teal-primary [text-shadow:0_0_rgba(0,0,0,0.1)]">
-                                <span className="">Start with a quick catch.</span>
+        <main className="relative h-[60rem] md:h-[60rem] z-50">
+            <BackGroundBeams className="h-[100%] md:h-[100%] [perspective:1000px] relative">
+                <div className="h-[40rem] md:h-[60rem] [perspective:1000px] relative flex flex-col max-w-6xl mx-auto w-full items-start justify-start">
+                    <div className="mt-4 text-center w-full">
+                        <h2 className="text-2xl py-5 relative z-20 md:text-4xl lg:text-7xl font-bold text-center text-black dark:text-white font-sans tracking-tight">
+                            What's brighter than your future?{" "}
+                            <div className="relative mx-auto  inline-block w-max [filter:drop-shadow(0px_1px_3px_rgba(27,_37,_80,_0.14))]">
+                                <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-teal-primary via-blue-primary to-teal-primary [text-shadow:0_0_rgba(0,0,0,0.1)]">
+                                    <span className="">Start with a quick catch.</span>
+                                </div>
+                                <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-teal-primary via-blue-primary to-teal-primary py-4">
+                                    <span className="">Start with a quick catch.</span>
+                                </div>
                             </div>
-                            <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-teal-primary via-blue-primary to-teal-primary py-4">
-                                <span className="">Start with a quick catch.</span>
-                            </div>
-                        </div>
-                    </h2>
-                </div>
+                        </h2>
+                    </div>
 
-                {/* Progress indicators */}
-                <div className="w-full flex my-5 justify-center">
-                    <div className="flex items-center space-x-4">
-                        {[0, 1, 2].map((step) => (
-                            <motion.div
-                                key={step}
-                                className={`w-3 h-3 rounded-full ${step <= currentStep
+                    {/* Progress indicators */}
+                    <div className="w-full flex mt-5 justify-center">
+                        <div className="flex items-center space-x-4">
+                            {[0, 1, 2].map((step) => (
+                                <motion.div
+                                    key={step}
+                                    className={`w-3 h-3 rounded-full ${step <= currentStep
                                         ? "bg-teal-primary"
                                         : "bg-blue-primary/30"
-                                    }`}
-                                initial={{ scale: step === currentStep ? 0.8 : 1 }}
-                                animate={{
-                                    scale: step === currentStep ? [0.8, 1.2, 0.8] : 1,
-                                    opacity: step <= currentStep ? 1 : 0.5
-                                }}
-                                transition={{
-                                    scale: {
-                                        duration: 2,
-                                        repeat: Infinity,
-                                        ease: "easeInOut"
-                                    }
-                                }}
+                                        }`}
+                                    initial={{ scale: step === currentStep ? 0.8 : 1 }}
+                                    animate={{
+                                        scale: step === currentStep ? [0.8, 1.2, 0.8] : 1,
+                                        opacity: step <= currentStep ? 1 : 0.5
+                                    }}
+                                    transition={{
+                                        scale: {
+                                            duration: 2,
+                                            repeat: Infinity,
+                                            ease: "easeInOut"
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Main content area with current tab */}
+                    <div className="w-full h-full">
+                        {tabs.length > 0 && (
+                            <MagicTab
+                                tabs={tabs}
+                                activeTabClassName="bg-teal-primary"
+                                tabClassName="text-white mx-1 font-medium"
+                                onTabChange={selectTab}
+                                activeTabIndex={currentStep}
                             />
-                        ))}
+                        )}
                     </div>
                 </div>
-
-                {/* Main content area with current tab */}
-                <div className="w-full h-full">
-                    {tabs.length > 0 && (
-                        <MagicTab
-                            tabs={tabs}
-                            activeTabClassName="bg-teal-primary"
-                            tabClassName="text-white mx-1 font-medium"
-                            onTabChange={selectTab}
-                            activeTabIndex={currentStep}
-                        />
-                    )}
-                </div>
-            </div>
-        </BackGroundBeams>
-       </main>
+            </BackGroundBeams>
+        </main>
 
 
     )
