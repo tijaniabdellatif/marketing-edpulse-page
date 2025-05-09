@@ -61,7 +61,7 @@ jobs:
       - name: Run tests
         run: npm run test:ci || true
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
 
   build:
@@ -88,12 +88,12 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-          NEXT_PUBLIC_APP_URL: ${{secrets.NEXT_PUBLIC_APP_URL}}
-          VERCEL_TOKEN: ${{secrets.VERCEL_TOKEN}}
-          VERCEL_ORG_ID: ${{secrets.VERCEL_ORG_ID}}
-          VERCEL_PROJECT_ID: ${{secrets.VERCEL_PROJECT_ID}}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
