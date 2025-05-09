@@ -113,7 +113,7 @@ export const Navbar = ({
                 "relative group text-zinc-700 text-center transition-colors duration-200"
               )}
             >
-              <span className="text-base group-hover:text-[#9C62FF] transition-colors duration-200 font-medium">
+              <span className="text-base group-hover:text-[#00897B] transition-colors duration-200 font-medium">
                 {navItem.name}
               </span>
             </a>

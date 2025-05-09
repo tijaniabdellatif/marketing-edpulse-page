@@ -109,12 +109,14 @@ export const MovingBorder = ({
   ry?: string;
   [key: string]: any;
 }) => {
-  const pathRef = useRef<any>();
+  // Fix: Provide initial value null to useRef
+  const pathRef = useRef<SVGRectElement | null>(null);
   const progress = useMotionValue<number>(0);
 
   useAnimationFrame((time) => {
+    // Add null check to prevent TypeScript errors
     const length = pathRef.current?.getTotalLength();
-    if (length) {
+    if (pathRef.current && length) {
       const pxPerMillisecond = length / duration;
       progress.set((time * pxPerMillisecond) % length);
     }
@@ -122,11 +124,18 @@ export const MovingBorder = ({
 
   const x = useTransform(
     progress,
-    (val) => pathRef.current?.getPointAtLength(val).x,
+    (val) => {
+      // Add null check to prevent TypeScript errors
+      return pathRef.current?.getPointAtLength(val)?.x || 0;
+    }
   );
+  
   const y = useTransform(
     progress,
-    (val) => pathRef.current?.getPointAtLength(val).y,
+    (val) => {
+      // Add null check to prevent TypeScript errors
+      return pathRef.current?.getPointAtLength(val)?.y || 0;
+    }
   );
 
   const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;

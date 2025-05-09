@@ -9,10 +9,10 @@ export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
   return (
     <>
-          {/* <AnimatePresence mode="wait"> */}
+          <AnimatePresence mode="wait"> 
 
-              {/* {showWelcome && <Welcome onComplete={() => setShowWelcome(false)} />}  */}
-               {/* {!showWelcome && ( */}
+            {showWelcome && <Welcome onComplete={() => setShowWelcome(false)} />} 
+            {!showWelcome && ( 
                  <motion.div
                  initial={{ opacity: 0 }}
                  animate={{ opacity: 1 }}
@@ -23,8 +23,8 @@ export default function Home() {
                   <Hero />
                   <QuizLayout />
                 </div>
-                </motion.div>
-          {/* </AnimatePresence> */}
+                </motion.div>)}
+           </AnimatePresence> 
     </>
   );
 }

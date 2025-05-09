@@ -1,10 +1,11 @@
+
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { navItems } from "@/data/constants";
-import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/navbar";
+import LandingAbout from '@/components/hoc/landing-about';
 
-// Use named import instead of default
+
 const LandingHero = dynamic(
   () => import("@/components/hoc/landig-hero").then(mod => mod.LandingHero), 
   {
@@ -15,16 +16,23 @@ const LandingHero = dynamic(
 
 export default function Landing() {
   return (
-    <main className={cn([
-      'relative overflow-clip mx-auto',
-      'flex flex-col justify-center items-center',
-      "min-h-screen"
-    ])}>
-      <div className='w-full relative z-10'>
-        <Navbar navItems={navItems} />
-        <Suspense fallback={<div className="h-screen flex items-center justify-center">Loading...</div>}>
-          <LandingHero />
-        </Suspense>
+    <main className="relative min-h-screen w-full overflow-x-hidden">
+     
+      <Navbar navItems={navItems} />
+      
+     
+      <div className="w-full">
+      
+        <section className="w-full">
+          <Suspense fallback={<div className="h-screen flex items-center justify-center">Loading...</div>}>
+            <LandingHero />
+          </Suspense>
+        </section>
+        
+      
+        <section className="w-full mt-0" id="about">
+          <LandingAbout />
+        </section>
       </div>
     </main>
   );
