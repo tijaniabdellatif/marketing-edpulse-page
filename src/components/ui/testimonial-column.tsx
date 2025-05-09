@@ -39,7 +39,7 @@ export default function TestimonialColumn(props: {
                   'max-w-xs w-full',
                   'shadow-[0_7px_14px_#EAEAEA]',
                   'border border-[#00897B]',
-                  'mt-2',
+                  'mt-3',
                 ])}
               >
                 <div className="text-sm leading-7 tracking-tight text-neutral-700">
