@@ -1,13 +1,4 @@
-import { TabContentWrapper } from '@/components/hoc/tab-content-wrapper';
 import { Gamepad2, BookOpenCheck, Sparkles, LucideIcon } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { PersonalInfoForm } from '@/components/hoc/personal-information';
-
 // Define type for a tab
 export interface MagicTab {
   title: string;
@@ -41,4 +32,15 @@ export const steps: Step[] = [
     title: "Unlock Your Language Journey",
     description: "Join our courses and grow your skills with confidence",
   },
+];
+
+export const navItems = [
+
+
+    { name: "About", link: "#about", icon: "ℹ️" },              // Info
+    { name: "Services", link: "#services", icon: "🛠️" },         // Tools/Services
+    { name: "Testimonials", link: "#testimonials", icon: "💼" },           // Professionalism/Work   // Knowledge/Experience
+    { name: "Join us", link: "#joinus", icon: "📞" }             // Phone/Contact
+
+
 ];
