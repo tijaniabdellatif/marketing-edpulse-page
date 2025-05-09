@@ -6,6 +6,8 @@ import { Navbar } from "@/components/navbar";
 import LandingAbout from '@/components/hoc/landing-about';
 import LandingFeatures from '@/components/hoc/landing-feature';
 import Testimonials from '@/components/hoc/testimonials';
+import LandingCta from '@/components/hoc/landing-cta';
+import Footer from '@/components/hoc/landing-footer';
 
 
 const LandingHero = dynamic(
@@ -43,6 +45,12 @@ export default function Landing() {
           <section className="w-full mt-0 bg-slate-100" id="testimonials">
           <Testimonials />
         </section>
+
+         <section className="w-full  mt-0 bg-slate-100" id="joinus">
+          <LandingCta />
+        </section>
+
+        <Footer />
       </div>
     </main>
   );
