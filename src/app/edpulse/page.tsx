@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { navItems } from "@/data/constants";
 import { Navbar } from "@/components/navbar";
 import LandingAbout from '@/components/hoc/landing-about';
+import LandingFeatures from '@/components/hoc/landing-feature';
 
 
 const LandingHero = dynamic(
@@ -32,6 +33,10 @@ export default function Landing() {
       
         <section className="w-full mt-0" id="about">
           <LandingAbout />
+        </section>
+
+         <section className="w-full mt-0 bg-slate-100" id="services">
+          <LandingFeatures />
         </section>
       </div>
     </main>

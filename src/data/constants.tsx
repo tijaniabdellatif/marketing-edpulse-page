@@ -6,8 +6,16 @@ import {
   Users,
   Headphones,
   ShieldCheck,
-  Globe
+  Globe,
+  GraduationCap,
+  Laptop,
+  PenTool,
+  MessageSquare,
+  BookOpen,
+  FileText,
+  Compass
 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/grid-skeleton';
 // Define type for a tab
 export interface MagicTab {
   title: string;
@@ -102,5 +110,52 @@ export const features = [
     description:
       "Join a vibrant international student community and unlock doors to the world.",
     icon: <Globe />,
+  },
+];
+
+export const gridItems = [
+  {
+    title: "English for All Levels",
+    description: "Beginner to advanced — we tailor classes to match your current skills and goals.",
+    header: <Skeleton>
+      <img className='object-fit h-[100%] w-[100%]' src="/level.png" alt="english level" />
+    </Skeleton>,
+    icon: <GraduationCap className="h-4 w-4 text-[#00897B]" />,
+  },
+  {
+    title: "Online & In-Person Classes",
+    description: "Learn your way, anytime — join virtual or classroom sessions from anywhere.",
+    header: <Skeleton> <img className='object-fit h-[100%] w-[100%]' src="/online.jpg" alt="online in person" /></Skeleton>,
+    icon: <Laptop className="h-4 w-4 text-[#00897B]" />,
+  },
+  {
+    title: "Academic & Exam Prep",
+    description: "Prepare for TOEFL, IELTS, and school exams with expert guidance.",
+    header: <Skeleton> <img className='object-fit h-[100%] w-[100%]' src="/exam.avif" alt="online in person" /></Skeleton>,
+    icon: <BookOpen className="h-4 w-4 text-[#00897B]" />,
+  },
+  {
+    title: "Conversation Practice",
+    description: "Boost your speaking skills with real-life dialogues and fluent expression.",
+    header: <Skeleton> <img className='object-fit h-[100%] w-[100%]' src="/conversation.jpg" alt="online in person" /></Skeleton>,
+    icon: <MessageSquare className="h-4 w-4 text-[#00897B]" />,
+  },
+  {
+    title: "Business English",
+    description: "Speak confidently at work with vocabulary and skills tailored to professionals.",
+    header:  <Skeleton> <img className='object-fit h-[100%] w-[100%]' src="/business.jpg" alt="online in person" /></Skeleton>,
+    icon: <FileText className="h-4 w-4 text-[#00897B]" />,
+  },
+  {
+    title: "Writing & Grammar Workshops",
+    description: "Master English structure and style through engaging writing sessions.",
+    header: <Skeleton> <img className='object-fit h-[100%] w-[100%]' src="/workshop.png" alt="online in person" /></Skeleton>,
+    icon: <PenTool className="h-4 w-4 text-[#00897B]" />,
+  },
+  {
+    title: "Cultural Exchange Programs",
+    description: "Explore new cultures and practice English in real-world settings.",
+    header: <Skeleton> <img className='object-fit h-[100%] w-[100%]' src="/exchange.jpg" alt="online in person" /></Skeleton>,
+    icon: <Compass className="h-4 w-4 text-[#00897B]" />,
   },
 ];
