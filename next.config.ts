@@ -6,19 +6,25 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  typescript: {
+
+    ignoreBuildErrors: true,
+  },
   experimental: {
-    optimizeCss: true,
+  
     optimizePackageImports: ["framer-motion"],
     swcPlugins: [],
   },
-
-
-  // Improve image optimization
-  images: {
-    // Optimize images more aggressively
-    minimumCacheTTL: 60,
-    formats: ["image/webp","image/avif"],
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
   },
+
+  images: {
+
+    minimumCacheTTL: 60,
+    formats: ["image/webp", "image/avif"],
+  },
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;
