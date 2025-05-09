@@ -8,7 +8,7 @@ export const Navbar = () => {
     ])}>
 
         <div className='flex items-center h-full justify-between w-[90%] xl:w-[80%] mx-auto'>
-
+            <div></div>
             <h1 className='text-xl md:text-2xl font-bold'><span className='text-3xl md:text-4xl text-gradient-blue-teal'>E</span>pulse</h1>
         </div>
     </div>
