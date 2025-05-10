@@ -115,6 +115,21 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    env:
+      EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+      EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+      EMAIL_SECURE: ${{ secrets.EMAIL_SECURE }}
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+      DATABASE_URL: ${{ secrets.DATABASE_DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      PABBLY_WEBHOOK_URL: ${{secrets.PABBLY_WEBHOOK_URL}}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -134,9 +149,67 @@ jobs:
         run: echo "legacy-peer-deps=true" > .npmrc
         
       - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        
+      - name: Create .env file for Vercel
         run: |
-         vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-         vercel env pull .env --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          # Create a .env file with the email configuration
+          echo "Creating .env file with email configuration for Vercel..."
+          
+          # Add email environment variables to .env file
+          echo "EMAIL_HOST=${{ secrets.EMAIL_HOST }}" >> .env
+          echo "EMAIL_PORT=${{ secrets.EMAIL_PORT }}" >> .env
+          echo "EMAIL_SECURE=${{ secrets.EMAIL_SECURE }}" >> .env
+          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
+          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
+          echo "EMAIL_FROM=${{ secrets.EMAIL_FROM }}" >> .env
+          
+          # Log that the .env file was created (without showing sensitive data)
+          echo "Created .env file with email configuration"
+      
+      - name: Ensure email environment variables are set in Vercel
+        run: |
+          # Set email environment variables in Vercel
+          echo "Setting email environment variables in Vercel..."
+          
+          # Email Host
+          if [ -n "$EMAIL_HOST" ]; then
+            echo "Setting EMAIL_HOST in Vercel environment..."
+            vercel env add EMAIL_HOST production "$EMAIL_HOST" --token=${{ secrets.VERCEL_TOKEN }} || true
+          fi
+          
+          # Email Port
+          if [ -n "$EMAIL_PORT" ]; then
+            echo "Setting EMAIL_PORT in Vercel environment..."
+            vercel env add EMAIL_PORT production "$EMAIL_PORT" --token=${{ secrets.VERCEL_TOKEN }} || true
+          fi
+          
+          # Email Secure
+          if [ -n "$EMAIL_SECURE" ]; then
+            echo "Setting EMAIL_SECURE in Vercel environment..."
+            vercel env add EMAIL_SECURE production "$EMAIL_SECURE" --token=${{ secrets.VERCEL_TOKEN }} || true
+          fi
+          
+          # Email User
+          if [ -n "$EMAIL_USER" ]; then
+            echo "Setting EMAIL_USER in Vercel environment..."
+            vercel env add EMAIL_USER production "$EMAIL_USER" --token=${{ secrets.VERCEL_TOKEN }} || true
+          fi
+          
+          # Email Password
+          if [ -n "$EMAIL_PASSWORD" ]; then
+            echo "Setting EMAIL_PASSWORD in Vercel environment..."
+            vercel env add EMAIL_PASSWORD production "$EMAIL_PASSWORD" --token=${{ secrets.VERCEL_TOKEN }} || true
+          fi
+          
+          # Email From
+          if [ -n "$EMAIL_FROM" ]; then
+            echo "Setting EMAIL_FROM in Vercel environment..."
+            vercel env add EMAIL_FROM production "$EMAIL_FROM" --token=${{ secrets.VERCEL_TOKEN }} || true
+          fi
+          
+          # Pull updated environment variables
+          vercel env pull --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         
       - name: Build Project Artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
