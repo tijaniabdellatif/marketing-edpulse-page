@@ -4,7 +4,7 @@ export const webhookConfigs: Record<string, WebhookConfig> = {
   pabbly: {
     url:
       process.env.PABBLY_WEBHOOK_URL ||
-      "https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTY4MDYzMDA0MzQ1MjY1NTUzMDUxMzEi_pc",
+      "https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTY4MDYzMDA0MzI1MjY4NTUzMjUxMzYi_pc",
     timeout: 3000,
   },
 };

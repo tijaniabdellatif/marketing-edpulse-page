@@ -29,7 +29,7 @@ type VisitorWithRelations = Visitor & {
  * Service for sending data to Pabbly
  */
 export class PabblyService {
-  private static PABBLY_WEBHOOK_URL = process.env.PABBLY_WEBHOOK_URL || 'https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTY4MDYzMDA0MzQ1MjY1NTUzMDUxMzEi_pc';
+  private static PABBLY_WEBHOOK_URL = process.env.PABBLY_WEBHOOK_URL || 'https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTY4MDYzMDA0MzI1MjY4NTUzMjUxMzYi_pc';
   
   /**
    * Create visitor record and send data to Pabbly
