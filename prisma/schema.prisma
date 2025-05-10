@@ -73,7 +73,7 @@ model Visitor {
   occupation Occupation?
   company    String?
   department String?
-  summary    String?
+
 
   // Relations
   interests   Interest[]
