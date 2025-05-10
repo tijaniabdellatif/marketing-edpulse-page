@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
  
 export function ColourfulText({ text ,className}: { text: string,className?:string }) {
   const colors = [
-    "#263238",
+    "#FF6B7A",
     "#FFFFFF",
-    "#78909C",
+    "#FFD54F",
+    "#26A69A",
+    
     
   ];
  

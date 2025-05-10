@@ -35,7 +35,7 @@ export default function Home() {
             <Navbar navItems={navItems} />
 
 
-            <div className="w-full">
+            <div className="w-full font-mulish-sans">
 
               <section className="w-full">
                 <Suspense fallback={<div className="h-screen flex items-center justify-center">Loading...</div>}>

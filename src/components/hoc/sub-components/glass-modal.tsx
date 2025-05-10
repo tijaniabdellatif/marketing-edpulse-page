@@ -52,7 +52,7 @@ export const GlassModal: React.FC<SignupModalProps> = ({
         // Auto-position in the center of the viewport
         style={{ position: 'fixed' }}
       >
-        <DialogHeader className="sticky top-0 bg-white/95 backdrop-blur-md pt-6 pb-2 z-10">
+        <DialogHeader className="bg-transparent pt-6 pb-2 z-10 relative w-[70%]">
           <DialogTitle className="text-2xl font-bold">{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>

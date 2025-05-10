@@ -10,6 +10,18 @@ const heroVariants = {
 };
 
 export const LandingHero = () => {
+
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      // Smooth scroll to the section
+      section.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <AuroraBackground>
       <motion.div
@@ -35,7 +47,8 @@ export const LandingHero = () => {
         <Button
           borderRadius="1.75rem"
           className="bg-white cursor-pointer dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
-          enableBounce={true} // Enable the bounce effect (this is true by default)
+          enableBounce={true} 
+          onClick={() => scrollToSection('joinus')}
         >
           Join Us Now
         </Button>

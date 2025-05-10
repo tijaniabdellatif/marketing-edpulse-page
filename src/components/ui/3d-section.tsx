@@ -3,6 +3,12 @@
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Updated ThreeDMarquee with dark overlay
 export const ThreeDMarqueeWithOverlay = ({
@@ -36,6 +42,7 @@ export const ThreeDMarqueeWithOverlay = ({
           className,
         )}
       >
+        {/* Existing marquee code... */}
         <div className="flex size-full items-center justify-center">
           <div className="size-[1720px] shrink-0 scale-50 sm:scale-75 lg:scale-100">
             <div
@@ -86,7 +93,7 @@ export const ThreeDMarqueeWithOverlay = ({
       {/* Dark Overlay - Full coverage with absolute positioning */}
       <div className="absolute inset-0">
         {/* Dark glassy background covering the entire component */}
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm "></div>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
         
         {/* Content centered in the overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -99,13 +106,27 @@ export const ThreeDMarqueeWithOverlay = ({
             <h2 className="text-3xl font-bold text-center mb-4 text-white">{overlayTitle}</h2>
             <p className="text-center mb-8 text-gray-200 max-w-md mx-auto">{overlayDescription}</p>
             
-            <Button 
-              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white w-full max-w-md"
-              size="lg"
-              onClick={onButtonClick}
-            >
-              {buttonText}
-            </Button>
+            {/* Button wrapped with Tooltip */}
+            <TooltipProvider>
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <Button 
+                    className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white w-full max-w-md"
+                    size="lg"
+                    onClick={onButtonClick}
+                  >
+                    {buttonText}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent 
+                  className="text-base font-medium bg-gradient-to-r from-blue-600 to-teal-500 text-white border-none p-3 font-medium animate-in fade-in-50 data-[side=bottom]:slide-in-from-top-1"
+                  side="top"
+                  sideOffset={5}
+                >
+                  Click to register now and get full access
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </motion.div>
         </div>
       </div>
@@ -113,7 +134,7 @@ export const ThreeDMarqueeWithOverlay = ({
   );
 };
 
-// These components are copied from your original code
+// GridLineHorizontal and GridLineVertical components remain unchanged
 const GridLineHorizontal = ({
   className,
   offset,
@@ -121,6 +142,7 @@ const GridLineHorizontal = ({
   className?: string;
   offset?: string;
 }) => {
+  // Existing code...
   return (
     <div
       style={
@@ -130,7 +152,7 @@ const GridLineHorizontal = ({
           "--height": "1px",
           "--width": "5px",
           "--fade-stop": "90%",
-          "--offset": offset || "200px", //-100px if you want to keep the line inside
+          "--offset": offset || "200px",
           "--color-dark": "rgba(255, 255, 255, 0.2)",
           maskComposite: "exclude",
         } as React.CSSProperties
@@ -156,6 +178,7 @@ const GridLineVertical = ({
   className?: string;
   offset?: string;
 }) => {
+  // Existing code...
   return (
     <div
       style={
@@ -165,7 +188,7 @@ const GridLineVertical = ({
           "--height": "5px",
           "--width": "1px",
           "--fade-stop": "90%",
-          "--offset": offset || "150px", //-100px if you want to keep the line inside
+          "--offset": offset || "150px",
           "--color-dark": "rgba(255, 255, 255, 0.2)",
           maskComposite: "exclude",
         } as React.CSSProperties

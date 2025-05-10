@@ -74,7 +74,7 @@ const LandingCta = () => {
                 isOpen={isModalOpen} 
                 onOpenChange={setIsModalOpen}
                 title="Sign Up for Early Access"
-                description="Create your account to get started with our AI platform"
+                description="Create your account get a personnalized learning path"
             />
         </div>
     );
