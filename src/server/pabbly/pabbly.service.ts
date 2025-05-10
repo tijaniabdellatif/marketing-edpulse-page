@@ -1,3 +1,5 @@
+// lib/services/pabbly.service.ts
+
 import axios from 'axios';
 import prisma from '@/lib/prisma';
 import { EmailService } from '@/server/emails/email.service';

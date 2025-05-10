@@ -54,19 +54,19 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Time tracking
   const startTimeRef = useRef<Date>(new Date());
   const [timeSpent, setTimeSpent] = useState<number>(0);
   const [lastFieldSeen, setLastFieldSeen] = useState<string>('');
-  
+
   // UTM parameters
   const [utmParams, setUtmParams] = useState({
     utmSource: "",
     utmMedium: "",
     utmCampaign: ""
   });
-  
+
   // Get UTM parameters from URL on component mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -74,7 +74,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       const utmSource = url.searchParams.get('utm_source');
       const utmMedium = url.searchParams.get('utm_medium');
       const utmCampaign = url.searchParams.get('utm_campaign');
-      
+
       setUtmParams({
         utmSource: utmSource || "",
         utmMedium: utmMedium || "",
@@ -82,7 +82,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       });
     }
   }, []);
-  
+
   // Update time spent every second
   useEffect(() => {
     const interval = setInterval(() => {
@@ -90,10 +90,10 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       const timeSpentInSeconds = Math.floor((now.getTime() - startTimeRef.current.getTime()) / 1000);
       setTimeSpent(timeSpentInSeconds);
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
   // Track the last field the user interacted with
   const handleFieldFocus = (fieldName: string) => {
     setLastFieldSeen(fieldName);
@@ -112,8 +112,8 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       preferences: [], // Initialize as empty array
       age: undefined,
       occupation: undefined,
-      company: "",
-      department: ""
+      company: "Edpulse Education",
+      department: "Marketing"
     },
   });
 
@@ -126,42 +126,42 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
         sendPartialSubmission();
       }
     };
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [success]);
-  
+
   // Send partial form data
   const sendPartialSubmission = async () => {
     try {
       const formData = form.getValues();
-      
+
       // Only send if at least first name is filled
       if (!formData.firstName) return;
-      
+
       // Add time tracking info and session info
       const partialData = {
         ...formData,
         timeSpent,
         lastFieldSeen,
         isPartial: true,
-        
+
         // Browser information
         userAgent: navigator.userAgent,
         referrer: document.referrer,
-        
+
         // UTM parameters
         ...utmParams
       };
-      
+
       // Send partial submission - using navigator.sendBeacon for reliability during page unload
       const blob = new Blob([JSON.stringify(partialData)], {
         type: 'application/json'
       });
-      
+
       navigator.sendBeacon('/api/pabbly/partial', blob);
     } catch (error) {
       console.error('Error sending partial submission:', error);
@@ -177,18 +177,18 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
 
     try {
       console.log('Submitting form data:', data);
-      
+
       // Add time tracking data and session info
       const enrichedData = {
         ...data,
         timeSpent,
         lastFieldSeen,
-        
+
         // Browser information
         userAgent: navigator.userAgent,
         referrer: document.referrer,
         ipAddress: null, // Will be determined server-side
-        
+
         // UTM parameters
         ...utmParams
       };
@@ -203,7 +203,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
 
       // Clear form
       form.reset();
-      
+
       // Reset time tracking
       startTimeRef.current = new Date();
       setTimeSpent(0);
@@ -219,7 +219,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
 
       if (axios.isAxiosError(err)) {
         errorMessage = err.response?.data?.message || err.message;
-        
+
         // If the error is related to CORS, provide a more helpful message
         if (err.message.includes('CORS') || err.message.includes('Network Error')) {
           errorMessage = 'Cannot reach our service. This might be due to network issues.';
@@ -472,7 +472,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
             />
           </motion.div>
 
-          {/* Occupation Field */}
+          {/* Occupation Field - HTML Select Fallback */}
           <motion.div variants={itemVariants}>
             <FormField
               control={form.control}
@@ -485,89 +485,31 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
                       <span className="text-gray-400 text-xs">(Optional)</span>
                     </span>
                   </FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                    onOpenChange={() => handleFieldFocus('occupation')}
-                  >
-                    <FormControl>
-                      <div className="relative">
-                        <Briefcase className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 z-10" />
-                        <SelectTrigger className="border-gray-300 focus-visible:ring-blue-500 pl-9">
-                          <SelectValue placeholder="Select your occupation" />
-                        </SelectTrigger>
-                      </div>
-                    </FormControl>
-                    <SelectContent>
-                      {occupationOptions.map((occupation) => (
-                        <SelectItem key={occupation} value={occupation}>
-                          {occupation.charAt(0).toUpperCase() + occupation.slice(1).toLowerCase().replace('_', ' ')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <div className="relative">
+                      <Briefcase className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                      <select
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className="w-full px-9 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white"
+                        onFocus={() => handleFieldFocus('occupation')}
+                      >
+                        <option value="">Select your occupation</option>
+                        {occupationOptions.map((occupation) => (
+                          <option key={occupation} value={occupation}>
+                            {occupation.charAt(0).toUpperCase() + occupation.slice(1).toLowerCase().replace('_', ' ')}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </FormControl>
                   <FormMessage className="text-xs font-normal" />
                 </FormItem>
               )}
             />
           </motion.div>
 
-          {/* Company and Department Row */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Company Field */}
-            <motion.div variants={itemVariants}>
-              <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <span className="flex items-center space-x-1">
-                        <span>Company</span>
-                        <span className="text-gray-400 text-xs">(Optional)</span>
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Your company"
-                        {...field}
-                        className="border-gray-300 focus-visible:ring-blue-500"
-                        onFocus={() => handleFieldFocus('company')}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-normal" />
-                  </FormItem>
-                )}
-              />
-            </motion.div>
 
-            {/* Department Field */}
-            <motion.div variants={itemVariants}>
-              <FormField
-                control={form.control}
-                name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <span className="flex items-center space-x-1">
-                        <span>Department</span>
-                        <span className="text-gray-400 text-xs">(Optional)</span>
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Your department"
-                        {...field}
-                        className="border-gray-300 focus-visible:ring-blue-500"
-                        onFocus={() => handleFieldFocus('department')}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-normal" />
-                  </FormItem>
-                )}
-              />
-            </motion.div>
-          </div>
 
           {/* Reasons Field */}
           <motion.div variants={itemVariants}>
@@ -612,7 +554,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
                       <span className="text-gray-400 text-xs">(Optional)</span>
                     </span>
                   </FormLabel>
-                  <div 
+                  <div
                     className="border rounded-md border-gray-300 p-3 space-y-3"
                     onFocus={() => handleFieldFocus('interests')}
                   >
@@ -635,10 +577,10 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
                                     return checked
                                       ? field.onChange([...currentValues, option.id])
                                       : field.onChange(
-                                          currentValues.filter(
-                                            (value) => value !== option.id
-                                          )
-                                        );
+                                        currentValues.filter(
+                                          (value) => value !== option.id
+                                        )
+                                      );
                                   }}
                                 />
                               </FormControl>
@@ -656,7 +598,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
               )}
             />
           </motion.div>
-          
+
           {/* Preferences Field as Multiple Choice */}
           <motion.div variants={itemVariants}>
             <FormField
@@ -670,7 +612,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
                       <span className="text-gray-400 text-xs">(Optional)</span>
                     </span>
                   </FormLabel>
-                  <div 
+                  <div
                     className="border rounded-md border-gray-300 p-3 space-y-3"
                     onFocus={() => handleFieldFocus('preferences')}
                   >
@@ -693,10 +635,10 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
                                     return checked
                                       ? field.onChange([...currentValues, option.id])
                                       : field.onChange(
-                                          currentValues.filter(
-                                            (value) => value !== option.id
-                                          )
-                                        );
+                                        currentValues.filter(
+                                          (value) => value !== option.id
+                                        )
+                                      );
                                   }}
                                 />
                               </FormControl>
