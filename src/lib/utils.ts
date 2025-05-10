@@ -31,7 +31,7 @@ export function getClientIp(request: Request): string | null {
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
     // X-Forwarded-For can contain multiple IPs, take the first one
-    return forwardedFor.split(",")[0].trim();
+    return forwardedFor.split(",").[0]!.trim();
   }
 
   // Try other common headers
