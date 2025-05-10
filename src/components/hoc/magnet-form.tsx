@@ -134,8 +134,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       console.error('Error sending partial submission:', error);
     }
   };
-  // In MagnetForm.tsx, update the onSubmit function to pass visitorId to onSuccess
- // In MagnetForm.tsx - onSubmit function
+
 const onSubmit = async (data: ExtendedFormValues) => {
   setLoading(true);
   setSuccess(false);
@@ -159,15 +158,14 @@ const onSubmit = async (data: ExtendedFormValues) => {
     startTimeRef.current = new Date();
     setTimeSpent(0);
     
-    // Log data before calling onSuccess
+   
     console.log("About to call onSuccess with:", response.data);
     
-    // Pass the whole response data to the parent
     if (onSuccess) {
       onSuccess(response.data);
     }
   } catch (err) {
-    // Error handling remains the same
+  
   } finally {
     setLoading(false);
   }
@@ -243,7 +241,7 @@ const onSubmit = async (data: ExtendedFormValues) => {
         </div>
       </motion.div>
 
-      {/* Form with react-hook-form and shadcn UI */}
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pr-1">
           {/* First name and last name row */}

@@ -63,10 +63,10 @@ export const GlassModal: React.FC<SignupModalProps> = ({
     }
   }, [isOpen]);
 
-  // Reset state when modal closes
+
   useEffect(() => {
     if (!isOpen) {
-      // Wait a bit before resetting states to avoid UI flickers
+     
       setTimeout(() => {
         if (!isOpen) {
           setFormSubmitted(false);
@@ -81,17 +81,16 @@ export const GlassModal: React.FC<SignupModalProps> = ({
   const handleFormSuccess = (data?: any) => {
     console.log("Form success callback received:", data);
 
-    // Force formSubmitted to true if the form was successful, even without visitorId
+   
     setFormSubmitted(true);
 
-    // Set visitorId if available
+   
     if (data?.visitorId) {
       console.log("Setting visitorId:", data.visitorId);
       setVisitorId(data.visitorId);
     } else {
       console.log("No visitorId found in response data");
-      // Set a fallback visitorId for testing if needed
-      // setVisitorId("fallback-visitor-id");
+     
     }
   };
 
@@ -147,12 +146,11 @@ export const GlassModal: React.FC<SignupModalProps> = ({
 
         <div className="grid gap-4 py-4 pb-6">
           {!formSubmitted ? (
-            // Step 1: Show the form
+          
             <MagnetForm
               onSuccess={handleFormSuccess}
             />
           ) : showLearningPath ? (
-            // Step 3: Show the generated learning path
             <div className="space-y-4">
               <div className="prose prose-sm max-w-none">
                 <div className="whitespace-pre-line p-6 bg-gradient-to-br from-blue-50 to-teal-50 rounded-lg border border-blue-100 text-gray-700 shadow-sm">
@@ -178,7 +176,7 @@ export const GlassModal: React.FC<SignupModalProps> = ({
               </div>
             </div>
           ) : (
-            // Step 2: Show success message with generate button
+            
             <div className="flex flex-col items-center justify-center py-8 space-y-6">
               <div className="w-full max-w-md p-6 bg-gradient-to-br from-blue-50 to-teal-50 rounded-lg border border-blue-100 text-center space-y-4 shadow-sm">
                 <CheckCircle2 className="mx-auto h-12 w-12 text-green-500" />

@@ -3,7 +3,9 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({
+  path:'.env'
+});
 
 export interface EmailOptions {
   to: string;
@@ -27,17 +29,15 @@ export class EmailService {
     
   
     return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || 'smtp.example.com',
-      port: parseInt(process.env.EMAIL_PORT || '587', 10),
-      secure: process.env.EMAIL_SECURE === 'true',
+      host: process.env.EMAIL_HOST || "smtp.gmail.com",
+      port: parseInt(process.env.EMAIL_PORT || '465', 465),
+      secure:  true,
       auth: {
-        user: process.env.EMAIL_USER || 'user@example.com',
-        pass: process.env.EMAIL_PASSWORD || 'password',
+        user: process.env.EMAIL_USER || 'tijani.idrissi.abdellatif@gmail.com',
+        pass: process.env.EMAIL_PASSWORD || 'dtmo bqmd ioro plzu',
       },
-      tls: {
-        rejectUnauthorized: true,
-        ciphers: 'SSLv3'
-      }
+      debug:true
+      
     });
   }
 
