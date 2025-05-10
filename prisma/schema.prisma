@@ -6,87 +6,176 @@ generator client {
 }
 
 datasource db {
-  provider =  "postgresql" // You can change this to mysql, sqlite, etc.
-  url      =  env("DATABASE_DATABASE_URL")
+  provider  = "postgresql" // You can change this to mysql, sqlite, etc.
+  url       = env("DATABASE_DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
+// ========== ENUMS ==========
 
+enum InterestType {
+  GRAMMAR
+  WRITING
+  SPEAKING
+  LISTENING
+  READING
+  VOCABULARY
+  PRONUNCIATION
+  CULTURE
+  BUSINESS_ENGLISH
+  ACADEMIC_ENGLISH
+  TEST_PREPARATION
+  CONVERSATION
+  OTHER
+}
 
-// Enum for occupation types
+enum PreferenceType {
+  VISUAL_LEARNING
+  AUDIO_LESSONS
+  GROUP_SESSIONS
+  ONE_ON_ONE
+  SELF_PACED
+  STRUCTURED_COURSE
+  SHORT_LESSONS
+  IMMERSIVE
+  GAME_BASED
+  READING_BASED
+  WRITING_FOCUSED
+  SPEAKING_FOCUSED
+  OTHER
+}
+
 enum Occupation {
   STUDENT
-  EMPLOYEE
+  PROFESSIONAL
+  TEACHER
+  BUSINESS_OWNER
   FREELANCER
-  FREE_OF_FUNCTION // Unemployed/Not currently working
+  RETIRED
+  HOMEMAKER
+  OTHER
 }
 
-// Visitor model to track users without authentication
+enum SubmissionStatus {
+  COMPLETED
+  PARTIAL
+  ABANDONED
+}
+
 model Visitor {
-  id        String   @id @default(uuid())
+  id         String      @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String?     @unique
+  phone      String?
+  age        Int?
+  reasons    String?
+  occupation Occupation?
+  company    String?
+  department String?
+  summary    String?
+
+  // Relations
+  interests   Interest[]
+  preferences Preference[]
+  sessions    Session[]
+  submissions FormSubmission[]
+
+  // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Personal information
-  firstName  String?
-  lastName   String?
-  email      String?
-  age        Int?
-  bio        String?
-  occupation Occupation?
-
-  // Tracking information
-  // Optional browser fingerprint for better tracking
-  sessions     Session[] // One visitor can have multiple sessions
-  // One visitor can take multiple quizzes
-
-  // Current proficiency level based on quiz results
-  currentLevel LanguageLevel? @default(A1)
-
-  @@index([email])
- 
 }
 
-// Session model to track visitor engagement
-model Session {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  startTime DateTime  @default(now())
-  endTime   DateTime?
-  duration  Int? // Duration in seconds, calculated when session ends
+model Interest {
+  id        String       @id @default(uuid())
+  visitor   Visitor      @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+  type      InterestType
 
-  // Session metadata
-  ipAddress   String?
-  userAgent   String?
-  referrer    String?
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([visitorId])
+}
+
+model Preference {
+  id        String         @id @default(uuid())
+  visitor   Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+  type      PreferenceType
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([visitorId])
+}
+
+model Session {
+  id        String  @id @default(uuid())
+  visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+
+  // Device info
+  ipAddress  String?
+  userAgent  String?
+  browser    String?
+  deviceType String?
+  os         String?
+
+  // Referrer
+  referrer String?
+
+  // UTM parameters
   utmSource   String?
   utmMedium   String?
   utmCampaign String?
 
-  // Relation to visitor
-  visitorId String
-  visitor   Visitor @relation(fields: [visitorId], references: [id])
+  // Relations
+  submissions FormSubmission[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([visitorId])
-  @@index([startTime])
 }
 
-// Quiz model to store different types of quizzes
+model FormSubmission {
+  id        String   @id @default(uuid())
+  visitor   Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+  session   Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  sessionId String?
 
-// Enum for language proficiency levels
-enum LanguageLevel {
-  A1
-  A2
-  B1
-  B2
-  C1
-  C2
-}
+  // Submission status
+  status SubmissionStatus @default(PARTIAL)
 
-// Enum for question difficulty
-enum QuestionDifficulty {
-  EASY
-  MEDIUM
-  HARD
+  // Form completion tracking
+  personalInfo    Boolean @default(false)
+  contactInfo     Boolean @default(false)
+  reasonsInfo     Boolean @default(false)
+  interestsInfo   Boolean @default(false)
+  preferencesInfo Boolean @default(false)
+
+  // Partial submission tracking
+  lastFieldSeen String?
+
+  // Time tracking
+  startTime  DateTime  @default(now())
+  submitTime DateTime?
+  timeSpent  Int? // In seconds
+
+  // Pabbly integration
+  sentToPabbly   Boolean   @default(false)
+  pabblyResponse String?
+  pabblySentAt   DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([visitorId])
+  @@index([sessionId])
 }
