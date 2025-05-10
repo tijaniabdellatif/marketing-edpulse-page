@@ -9,8 +9,6 @@ export function ColourfulText({ text ,className}: { text: string,className?:stri
     "#FFFFFF",
     "#FFD54F",
     "#26A69A",
-    
-    
   ];
  
   const [currentColors, setCurrentColors] = React.useState(colors);

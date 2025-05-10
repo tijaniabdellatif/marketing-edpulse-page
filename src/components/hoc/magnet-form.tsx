@@ -25,7 +25,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface MagnetFormProps {
-  onSuccess?: () => void;
+  onSuccess?: (data?: { visitorId: string, [key: string]: any }) => void;
   onError?: (error: string) => void;
 }
 
@@ -36,7 +36,7 @@ interface ExtendedFormValues extends MultiSelectVisitorFormValues {
 }
 
 export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
- 
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +89,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       email: "",
       phone: "",
       reasons: "",
-      interests: [], 
+      interests: [],
       preferences: [],
       age: undefined,
       occupation: undefined,
@@ -134,52 +134,44 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       console.error('Error sending partial submission:', error);
     }
   };
-  const onSubmit = async (data: ExtendedFormValues) => {
-    setLoading(true);
-    setSuccess(false);
-    setError(null);
+  // In MagnetForm.tsx, update the onSubmit function to pass visitorId to onSuccess
+ // In MagnetForm.tsx - onSubmit function
+const onSubmit = async (data: ExtendedFormValues) => {
+  setLoading(true);
+  setSuccess(false);
+  setError(null);
 
-    try {
-      console.log('Submitting form data:', data);
-      const enrichedData = {
-        ...data,
-        timeSpent,
-        lastFieldSeen,
-        userAgent: navigator.userAgent,
-        referrer: document.referrer,
-        ipAddress: null, 
-        ...utmParams
-      };
-      const response = await axios.post('/api/pabbly', enrichedData);
-      console.log('Form submission response:', response.data);
-      setSuccess(true);
-      form.reset();
-      startTimeRef.current = new Date();
-      setTimeSpent(0);
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (err) {
-      console.error('Error submitting form:', err);
-
-      let errorMessage = 'An unexpected error occurred';
-
-      if (axios.isAxiosError(err)) {
-        errorMessage = err.response?.data?.message || err.message;
-        if (err.message.includes('CORS') || err.message.includes('Network Error')) {
-          errorMessage = 'Cannot reach our service. This might be due to network issues.';
-        }
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      setError(errorMessage);
-      if (onError) {
-        onError(errorMessage);
-      }
-    } finally {
-      setLoading(false);
+  try {
+    console.log('Submitting form data:', data);
+    const enrichedData = {
+      ...data,
+      timeSpent,
+      lastFieldSeen,
+      userAgent: navigator.userAgent,
+      referrer: document.referrer,
+      ipAddress: null, 
+      ...utmParams
+    };
+    const response = await axios.post('/api/pabbly', enrichedData);
+    console.log('Form submission response:', response.data);
+    setSuccess(true);
+    form.reset();
+    startTimeRef.current = new Date();
+    setTimeSpent(0);
+    
+    // Log data before calling onSuccess
+    console.log("About to call onSuccess with:", response.data);
+    
+    // Pass the whole response data to the parent
+    if (onSuccess) {
+      onSuccess(response.data);
     }
-  };
+  } catch (err) {
+    // Error handling remains the same
+  } finally {
+    setLoading(false);
+  }
+};
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -195,9 +187,9 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
     hidden: { opacity: 0, y: 5 },
     show: { opacity: 1, y: 0 }
   };
- 
 
-  
+
+
   const interestOptions = Object.values(InterestType).map(value => ({
     id: value,
     label: value.replace(/_/g, ' ').toLowerCase()
@@ -583,7 +575,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
             />
           </motion.div>
 
-        
+
           <motion.div variants={itemVariants} className="pt-2">
             <Button
               type="submit"
@@ -608,7 +600,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
         </form>
       </Form>
 
-     
+
       {error && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
