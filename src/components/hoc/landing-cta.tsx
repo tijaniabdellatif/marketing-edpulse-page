@@ -69,7 +69,7 @@ const LandingCta = () => {
                 />
             </div>
             
-            {/* Separate Modal Component */}
+      
             <GlassModal 
                 isOpen={isModalOpen} 
                 onOpenChange={setIsModalOpen}

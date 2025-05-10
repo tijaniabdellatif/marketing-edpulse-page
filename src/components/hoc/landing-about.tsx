@@ -1,13 +1,13 @@
 "use client";
 import React from 'react';
-import { motion } from 'framer-motion'; // Corrected import
+import { motion } from 'framer-motion'; 
 import { LampContainer } from '../ui/lamp';
 import { Features } from './sub-components/features';
 
 const LandingAbout = () => {
     return (
         <div className="w-full">
-            {/* LampContainer with visible height */}
+           
             <div className="w-full h-[60vh] relative overflow-visible">
                 <LampContainer 
                     className="w-full"
@@ -30,7 +30,7 @@ const LandingAbout = () => {
                 </LampContainer>
             </div>
             
-            {/* Features section with proper positioning */}
+           
             <div className="w-full mt-[-10vh] relative z-20 bg-slate-100">
                 <Features />
             </div>

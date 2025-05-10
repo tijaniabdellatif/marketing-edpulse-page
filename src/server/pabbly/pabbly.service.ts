@@ -1,5 +1,3 @@
-// lib/services/pabbly.service.ts
-
 import axios from 'axios';
 import prisma from '@/lib/prisma';
 import { EmailService } from '@/server/emails/email.service';
@@ -25,9 +23,6 @@ type VisitorWithRelations = Visitor & {
   submissions?: FormSubmission[];
 };
 
-/**
- * Service for sending data to Pabbly
- */
 export class PabblyService {
   private static PABBLY_WEBHOOK_URL = process.env.PABBLY_WEBHOOK_URL || 'https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTY4MDYzMDA0MzI1MjY4NTUzMjUxMzYi_pc';
   
@@ -80,19 +75,16 @@ export class PabblyService {
         preferences: preferences as PreferenceType[]
       });
       
-      // Find existing session or create a new one
       let session = await prisma.session.findFirst({
         where: {
           visitorId: visitor.id,
           createdAt: {
-            // Find sessions created in the last 24 hours
             gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
           }
         }
       });
       
       if (session) {
-        // Update existing session with new data
         session = await prisma.session.update({
           where: { id: session.id },
           data: {
@@ -104,7 +96,6 @@ export class PabblyService {
           }
         });
       } else {
-        // Create a new session if none exists
         session = await prisma.session.create({
           data: {
             visitorId: visitor.id,
@@ -120,8 +111,7 @@ export class PabblyService {
           }
         });
       }
-      
-      // Create form submission
+    
       const submission = await prisma.formSubmission.create({
         data: {
           visitorId: visitor.id,
@@ -137,16 +127,14 @@ export class PabblyService {
           submitTime: isPartial ? undefined : new Date()
         }
       });
-      
-      // Send to Pabbly
+    
       const pabblyResponse = await this.sendToPabbly(
         visitor,
         session,
         submission,
         isPartial
       );
-      
-      // Update submission with Pabbly response
+    
       await prisma.formSubmission.update({
         where: { id: submission.id },
         data: {
@@ -156,7 +144,7 @@ export class PabblyService {
         }
       });
       
-      // Get the complete visitor with all relations
+     
       const completeVisitor = await prisma.visitor.findUnique({
         where: { id: visitor.id },
         include: {
@@ -167,10 +155,9 @@ export class PabblyService {
         }
       }) as VisitorWithRelations;
       
-      // Check if email is needed for missing preferences or interests
+
       if (!isPartial && !submission.interestsInfo && !submission.preferencesInfo && email) {
-        // Only send email if this is a complete submission, not partial
-        // and if both interests and preferences are missing
+       
         this.sendMissingPreferencesEmail(
           email, 
           firstName, 
@@ -222,7 +209,7 @@ export class PabblyService {
       preferences
     } = data;
     
-    // Try to find visitor by email
+    
     let visitor: Visitor | null = null;
     
     if (email) {
@@ -232,7 +219,7 @@ export class PabblyService {
     }
     
     if (visitor) {
-      // Update existing visitor
+
       visitor = await prisma.visitor.update({
         where: { id: visitor.id },
         data: {
@@ -247,7 +234,6 @@ export class PabblyService {
         }
       });
     } else {
-      // Create new visitor
       visitor = await prisma.visitor.create({
         data: {
           firstName:firstName!,
@@ -262,24 +248,20 @@ export class PabblyService {
         }
       });
     }
-    
-    // Process interests if provided
+  
     if (interests && interests.length > 0) {
       try {
-        // Delete existing interests
         await prisma.interest.deleteMany({
           where: { visitorId: visitor.id }
         });
-        
-        // Create new interests with proper type validation
+    
         for (const interest of interests) {
-          // Validate that interest is a valid enum value
           if (Object.values(InterestType).includes(interest)) {
             await prisma.interest.create({
               data: {
                 visitorId: visitor.id,
                 type: interest,
-                updatedAt: new Date() // Explicitly set updatedAt
+                updatedAt: new Date()
               }
             });
           } else {
@@ -288,27 +270,27 @@ export class PabblyService {
         }
       } catch (error) {
         console.error('Error processing interests:', error);
-        // Continue execution even if interest processing fails
+        
       }
     }
     
-    // Process preferences if provided
+ 
     if (preferences && preferences.length > 0) {
       try {
-        // Delete existing preferences
+      
         await prisma.preference.deleteMany({
           where: { visitorId: visitor.id }
         });
         
-        // Create new preferences with proper type validation
+        
         for (const preference of preferences) {
-          // Validate that preference is a valid enum value
+         
           if (Object.values(PreferenceType).includes(preference)) {
             await prisma.preference.create({
               data: {
                 visitorId: visitor.id,
                 type: preference,
-                updatedAt: new Date() // Explicitly set updatedAt
+                updatedAt: new Date()
               }
             });
           } else {
@@ -317,7 +299,7 @@ export class PabblyService {
         }
       } catch (error) {
         console.error('Error processing preferences:', error);
-        // Continue execution even if preference processing fails
+      
       }
     }
     
@@ -333,7 +315,7 @@ export class PabblyService {
     submission: FormSubmission,
     isPartial: boolean
   ): Promise<any> {
-    // Get interests and preferences
+    
     const interests = await prisma.interest.findMany({
       where: { visitorId: visitor.id }
     });
@@ -342,16 +324,16 @@ export class PabblyService {
       where: { visitorId: visitor.id }
     });
     
-    // Format interests and preferences for Pabbly
+   
     const interestTypes = interests.map(i => i.type);
     const preferenceTypes = preferences.map(p => p.type);
     
-    // Create payload based on submission type
+    
     const payload = isPartial
       ? this.createPartialSubmissionPayload(visitor, session, submission, interestTypes, preferenceTypes)
       : this.createCompleteSubmissionPayload(visitor, session, submission, interestTypes, preferenceTypes);
     
-    // Send to Pabbly
+    
     console.log(`Sending ${isPartial ? 'partial' : 'complete'} submission to Pabbly:`, JSON.stringify(payload, null, 2));
     
     try {
@@ -360,7 +342,7 @@ export class PabblyService {
     } catch (error) {
       console.error('Error sending data to Pabbly:', error);
       
-      // Return error information for debugging
+      
       if (axios.isAxiosError(error)) {
         return {
           error: true,
@@ -387,7 +369,7 @@ export class PabblyService {
     missingPreferences: boolean
   ): Promise<void> {
     try {
-      // Send email
+     
       const result = await EmailService.sendPreferencesReminderEmail(
         email,
         firstName,
@@ -416,16 +398,16 @@ export class PabblyService {
     preferences: PreferenceType[]
   ): any {
     return {
-      // Metadata
+    
       event_type: "form_submission",
       submission_status: "complete",
       timestamp: new Date().toISOString(),
       
-      // Company information
+    
       company: visitor.company || "EdPulse-Education",
       department: visitor.department || "MARKETING",
       
-      // Visitor information
+   
       visitor: {
         id: visitor.id,
         first_name: visitor.firstName,
@@ -437,11 +419,11 @@ export class PabblyService {
         reasons: visitor.reasons
       },
       
-      // Interest and preference selections
+    
       interests,
       preferences,
       
-      // Form analytics
+     
       form_analytics: {
         submission_id: submission.id,
         start_time: submission.startTime.toISOString(),
@@ -449,17 +431,17 @@ export class PabblyService {
         time_spent_seconds: submission.timeSpent
       },
       
-      // Session information
+     
       session: {
         id: session.id,
         referrer: session.referrer,
         
-        // Device information
+    
         browser: session.browser,
         device_type: session.deviceType,
         os: session.os,
         
-        // UTM parameters
+      
         utm_source: session.utmSource,
         utm_medium: session.utmMedium,
         utm_campaign: session.utmCampaign
@@ -478,16 +460,16 @@ export class PabblyService {
     preferences: PreferenceType[]
   ): any {
     return {
-      // Metadata
+     
       event_type: "form_submission",
       submission_status: "partial",
       timestamp: new Date().toISOString(),
       
-      // Company information
+   
       company: visitor.company || "EdPulse-Education",
       department: visitor.department || "MARKETING",
       
-      // Visitor information
+    
       visitor: {
         id: visitor.id,
         first_name: visitor.firstName,
@@ -499,11 +481,10 @@ export class PabblyService {
         reasons: visitor.reasons
       },
       
-      // Interest and preference selections (if completed)
       ...(submission.interestsInfo ? { interests } : {}),
       ...(submission.preferencesInfo ? { preferences } : {}),
       
-      // Form analytics
+    
       form_analytics: {
         submission_id: submission.id,
         start_time: submission.startTime.toISOString(),
@@ -519,17 +500,16 @@ export class PabblyService {
         }
       },
       
-      // Session information
+     
       session: {
         id: session.id,
         referrer: session.referrer,
         
-        // Device information
+      
         browser: session.browser,
         device_type: session.deviceType,
         os: session.os,
         
-        // UTM parameters
         utm_source: session.utmSource,
         utm_medium: session.utmMedium,
         utm_campaign: session.utmCampaign

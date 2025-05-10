@@ -10,9 +10,8 @@ export const webhookConfigs: Record<string, WebhookConfig> = {
 };
 
 export const registerAllWebhooks = (axiosService: any) => {
-  // Register each webhook configuration
+ 
   Object.entries(webhookConfigs).forEach(([name, config]) => {
-    // Only register webhooks that have a URL configured
     if (config.url) {
       axiosService.registerWebhook(name, config);
     }

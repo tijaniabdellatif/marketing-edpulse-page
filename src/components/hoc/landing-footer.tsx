@@ -56,10 +56,8 @@ const NewsletterForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // This will be replaced with your server action for subscription
     console.log("Submitted email:", email);
     setIsSubmitted(true);
-    // Reset after 3 seconds
     setTimeout(() => setIsSubmitted(false), 3000);
   };
 

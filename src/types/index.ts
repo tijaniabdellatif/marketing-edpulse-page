@@ -22,3 +22,5 @@ export interface BioFormProps {
   onComplete: () => void;
   onSkip: () => void;
 }
+
+

@@ -1,8 +1,8 @@
 "use client";
 import React from 'react';
-import { motion } from "framer-motion"; // Using correct import
+import { motion } from "framer-motion"; 
 import { AuroraBackground } from "@/components/ui/aurora";
-import { Button } from '../ui/moving-border'; // Your enhanced button with bounce effect
+import { Button } from '../ui/moving-border';
 
 const heroVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -43,7 +43,7 @@ export const LandingHero = () => {
 
         </div>
         
-        {/* Using your enhanced Button with built-in bounce effect */}
+        
         <Button
           borderRadius="1.75rem"
           className="bg-white cursor-pointer dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"

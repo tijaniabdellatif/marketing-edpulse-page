@@ -1,4 +1,4 @@
-// lib/api/axios-service.ts
+
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -7,7 +7,7 @@ import axios, {
 } from "axios";
 import { registerAllWebhooks } from '@/server/pabbly/webhook-config';
 
-// Interface for webhook configuration
+
 export interface WebhookConfig {
   url: string;
   token?: string;
@@ -16,7 +16,7 @@ export interface WebhookConfig {
   timeout?: number;
 }
 
-// Global API configuration
+
 export interface ApiConfig {
   baseURL?: string;
   timeout?: number;
@@ -46,10 +46,10 @@ class AxiosService {
       },
     });
 
-    // Request interceptor for adding headers, tokens, etc.
+
     this.axiosInstance.interceptors.request.use(
       (reqConfig: InternalAxiosRequestConfig) => {
-        // Apply custom request interceptor if provided
+      
         if (config?.interceptors?.request) {
           return config.interceptors.request(reqConfig);
         }
@@ -60,17 +60,16 @@ class AxiosService {
       }
     );
 
-    // Response interceptor for handling errors globally
     this.axiosInstance.interceptors.response.use(
       (response) => {
-        // Apply custom response interceptor if provided
+     
         if (config?.interceptors?.response) {
           return config.interceptors.response(response);
         }
         return response;
       },
       (error) => {
-        // Log errors or handle specific HTTP status codes
+      
         console.error("API Error:", error.response?.data || error.message);
         return Promise.reject(error);
       }
@@ -128,7 +127,7 @@ class AxiosService {
       ...additionalConfig,
     };
 
-    // Add authentication token if provided
+
     if (webhookConfig.token) {
       switch (webhookConfig.tokenType) {
         case "Bearer":
@@ -144,10 +143,10 @@ class AxiosService {
           };
           break;
         case "Custom":
-          // For custom implementations, assume the token is added to headers in the webhook config
+          
           break;
         default:
-          // Default to Bearer if not specified
+        
           requestConfig.headers = {
             ...requestConfig.headers,
             Authorization: `Bearer ${webhookConfig.token}`,
@@ -212,17 +211,14 @@ class AxiosService {
 
 export const initializeAxiosService = (config?: ApiConfig): AxiosService => {
   const instance = AxiosService.getInstance(config);
-  
-  // Register all configured webhooks
   registerAllWebhooks(instance);
-  
   return instance;
 };
 
 // Export a singleton instance
 export const axiosService = initializeAxiosService();
 
-// Export type for request/response data
+
 export type ApiResponse<T> = {
   success: boolean;
   data?: T;

@@ -24,21 +24,19 @@ export const GlassModal: React.FC<SignupModalProps> = ({
   title = "Sign Up",
   description = "Create your account to get started with our platform",
 }) => {
-  // State to track if the modal has been opened
+ 
   const [hasOpened, setHasOpened] = useState(false);
 
   // Effect to scroll to top of modal content when opened
   useEffect(() => {
     if (isOpen) {
       setHasOpened(true);
-      
-      // Scroll to the top of the modal with a small delay to ensure it's rendered
+     
       setTimeout(() => {
         const dialogContent = document.querySelector('[role="dialog"]');
         if (dialogContent) {
           dialogContent.scrollTop = 0;
           
-          // Ensure the modal is positioned in the viewport
           dialogContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 100);
@@ -49,7 +47,7 @@ export const GlassModal: React.FC<SignupModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent 
         className="relative z-[7000] sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-md"
-        // Auto-position in the center of the viewport
+       
         style={{ position: 'fixed' }}
       >
         <DialogHeader className="bg-transparent pt-6 pb-2 z-10 relative w-[70%]">
@@ -60,7 +58,7 @@ export const GlassModal: React.FC<SignupModalProps> = ({
         <div className="grid gap-4 py-4 pb-6">
           <MagnetForm 
             onSuccess={() => {
-              // Close modal after successful submission with a small delay
+      
               setTimeout(() => onOpenChange(false), 2000);
             }}
           />

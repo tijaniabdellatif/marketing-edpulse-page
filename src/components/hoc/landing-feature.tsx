@@ -7,7 +7,7 @@ const LandingFeatures = () => {
     return (
 
         <div className="overflow-x-clip  bg-slate-100 overflow-hidden  py-10 md:py-12 pb-20 font-mulish-sans">
-            {/* LampContainer with visible height */}
+            
             <div className="max-w-[540px] mx-auto pricing-head_before relative">
                      <div className="flex justify-center py-4">
                       

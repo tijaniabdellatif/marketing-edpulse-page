@@ -50,10 +50,6 @@ export function saveVisitorId(visitorId: string): void {
     localStorage.setItem('visitorId', visitorId);
   }
 }
-
-/**
- * Get visitor ID from localStorage
- */
 export function getVisitorId(): string | null {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('visitorId');
@@ -61,9 +57,6 @@ export function getVisitorId(): string | null {
   return null;
 }
 
-/**
- * Remove visitor ID from localStorage
- */
 export function removeVisitorId(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('visitorId');

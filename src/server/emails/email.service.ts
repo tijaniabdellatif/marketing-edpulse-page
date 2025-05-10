@@ -1,4 +1,4 @@
-// lib/services/email.service.ts - MODIFIED VERSION
+
 
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
@@ -14,7 +14,7 @@ export interface EmailOptions {
 
 export class EmailService {
   private static getTransporter() {
-    // Log config (for debugging)
+    
     console.log('Email service initializing with config:', {
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
@@ -25,7 +25,7 @@ export class EmailService {
       }
     });
     
-    // Create transporter with more Gmail-friendly settings
+  
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST || 'smtp.example.com',
       port: parseInt(process.env.EMAIL_PORT || '587', 10),
@@ -35,8 +35,7 @@ export class EmailService {
         pass: process.env.EMAIL_PASSWORD || 'password',
       },
       tls: {
-        // For Gmail, we need different settings
-        rejectUnauthorized: true, // More secure for production
+        rejectUnauthorized: true,
         ciphers: 'SSLv3'
       }
     });
@@ -51,7 +50,7 @@ export class EmailService {
     const transporter = this.getTransporter();
     
     try {
-      // Verify connection before sending
+      
       await transporter.verify();
       console.log(`SMTP connection verified successfully to ${process.env.EMAIL_HOST}`);
       
@@ -68,12 +67,10 @@ export class EmailService {
       console.log(`Email sent successfully to ${to} (${info.messageId})`);
       return true;
     } catch (error) {
-      // Enhanced error logging
       console.error('Error sending email:', error);
       if (error instanceof Error) {
         console.error(`Error name: ${error.name}, message: ${error.message}`);
-        
-        // Log environment context for debugging
+      
         console.error('Environment context:', {
           NODE_ENV: process.env.NODE_ENV,
           isVercel: !!process.env.VERCEL,
@@ -85,14 +82,13 @@ export class EmailService {
     }
   }
 
-  // Keep the rest of your methods unchanged
   public static async sendPreferencesReminderEmail(
     email: string,
     firstName: string,
     missingInterests: boolean,
     missingPreferences: boolean
   ): Promise<boolean> {
-    // Your existing implementation
+   
     try {
       if (!email) {
         console.warn('Cannot send reminder email: no email address provided');

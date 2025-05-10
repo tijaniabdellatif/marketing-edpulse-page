@@ -14,7 +14,6 @@ export const AuroraBackground = ({
   ...props
 }: AuroraBackgroundProps) => {
   return (
-    // Remove the outer <main> tag which is limiting the width
     <div
       className={cn(
         "transition-bg relative flex min-h-[100vh] w-full flex-col items-center justify-center bg-zinc-50 text-slate-950 dark:bg-zinc-900",

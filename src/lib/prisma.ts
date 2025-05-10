@@ -1,12 +1,12 @@
-// lib/prisma.ts
+
 import { PrismaClient } from '@prisma/client';
 
-// Prevent multiple instances of Prisma Client in development
+
 declare global {
   var prisma: PrismaClient | undefined;
 }
 
-// PrismaClient initialization with better error handling
+
 export const prisma = global.prisma || new PrismaClient({
   log: process.env.NODE_ENV === 'development' 
     ? ['query', 'error', 'warn'] 
@@ -14,7 +14,6 @@ export const prisma = global.prisma || new PrismaClient({
   errorFormat: 'pretty',
 });
 
-// Add connection retry logic for better resilience
 async function connectWithRetry(retries = 5, delay = 1000) {
   for (let i = 0; i < retries; i++) {
     try {

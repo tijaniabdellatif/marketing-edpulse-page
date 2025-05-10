@@ -5,7 +5,6 @@ import { fadeIn } from "@/lib/animations";
 import { steps } from "@/data/constants";
 import { BackgroundLines } from "../ui/background-lines";
 import { ColourfulText } from "../ui/colourful-text";
-import { LucideIcon } from "lucide-react";
 
 interface WelcomeProps {
   onComplete: () => void;
@@ -16,14 +15,11 @@ export function Welcome({ onComplete }: WelcomeProps) {
   const [isComplete, setIsComplete] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handle step transitions
+
   useEffect(() => {
-    // Clear any existing timer when component re-renders
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-
-    // Set new timer for step transition
     timerRef.current = setTimeout(() => {
       if (currentStep < steps.length - 1) {
         setCurrentStep(prev => prev + 1);
@@ -33,7 +29,6 @@ export function Welcome({ onComplete }: WelcomeProps) {
       }
     }, 2000);
 
-    // Cleanup on unmount
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -43,9 +38,9 @@ export function Welcome({ onComplete }: WelcomeProps) {
 
   return (
     <div className="fixed inset-0 w-full h-screen overflow-hidden font-mulish-sans">
-      <BackgroundLines 
+      <BackgroundLines
         className="absolute inset-0 w-full h-full bg-blue-dark"
-        svgOptions={{ 
+        svgOptions={{
           duration: 15,
           lineCount: 30,
           opacity: 0.2
@@ -65,7 +60,7 @@ export function Welcome({ onComplete }: WelcomeProps) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  transition={{ 
+                  transition={{
                     duration: 0.5,
                     ease: "easeInOut"
                   }}
@@ -85,7 +80,7 @@ export function Welcome({ onComplete }: WelcomeProps) {
                           ease: "easeInOut"
                         }}
                       >
-                        {/* Teal circle background for icon */}
+
                         <div className="w-20 h-20 rounded-full bg-teal-primary flex items-center justify-center mx-auto shadow-md">
                           {(() => {
                             const Icon = steps[currentStep].icon;
@@ -93,8 +88,8 @@ export function Welcome({ onComplete }: WelcomeProps) {
                           })()}
                         </div>
                       </motion.div>
-                      
-                      {/* Teal-Cyan gradient text for title */}
+
+
                       <motion.h1
                         className="text-gradient-blue-teal text-4xl md:text-5xl font-bold mb-6 text-shadow-sm"
                         variants={fadeIn}
@@ -103,8 +98,8 @@ export function Welcome({ onComplete }: WelcomeProps) {
                       >
                         {steps[currentStep].title}
                       </motion.h1>
-                      
-                      {/* White text for description */}
+
+
                       <motion.p
                         className="text-xl text-white max-w-2xl mx-auto"
                         variants={fadeIn}
@@ -121,7 +116,7 @@ export function Welcome({ onComplete }: WelcomeProps) {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ 
+                  transition={{
                     duration: 0.8,
                     ease: "easeInOut"
                   }}
@@ -129,7 +124,7 @@ export function Welcome({ onComplete }: WelcomeProps) {
                 >
                   <div className="w-24 h-24 mx-auto mb-8">
                     <div className="relative w-full h-full">
-                      {/* Coral spinner for loading animation */}
+
                       <div className="absolute inset-0 border-t-2 border-r-2 border-coral-primary rounded-full animate-spin" />
                       <div className="absolute inset-2 border-t-2 border-l-2 border-coral-primary/50 rounded-full animate-spin-slow" />
                       <div className="absolute inset-4 border-b-2 border-r-2 border-coral-primary/30 rounded-full animate-spin-slower" />

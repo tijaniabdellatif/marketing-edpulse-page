@@ -3,16 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { Loader2, CheckCircle2, AlertCircle, Sparkles, Rocket, Lock, Mail, Phone, MessageSquare, BookOpen, Briefcase, Calendar } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle, Mail, Phone, MessageSquare, Briefcase, Calendar } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { multiSelectVisitorFormSchema, type MultiSelectVisitorFormValues } from '@/lib/validator/webhook-schema';
-import { InterestType, PreferenceType, Occupation, SubmissionStatus } from '@prisma/client';
-
-// shadcn UI components
+import { InterestType, PreferenceType, Occupation } from '@prisma/client';
+import { benefits } from '@/data/constants';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
@@ -23,18 +21,7 @@ import {
   FormMessage,
   FormDescription
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface MagnetFormProps {
@@ -42,7 +29,6 @@ interface MagnetFormProps {
   onError?: (error: string) => void;
 }
 
-// Extended form values to include all possible fields from API and service
 interface ExtendedFormValues extends MultiSelectVisitorFormValues {
   isPartial?: boolean;
   lastFieldSeen?: string;
@@ -50,24 +36,19 @@ interface ExtendedFormValues extends MultiSelectVisitorFormValues {
 }
 
 export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
-  // Status states
+ 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Time tracking
   const startTimeRef = useRef<Date>(new Date());
   const [timeSpent, setTimeSpent] = useState<number>(0);
   const [lastFieldSeen, setLastFieldSeen] = useState<string>('');
-
-  // UTM parameters
   const [utmParams, setUtmParams] = useState({
     utmSource: "",
     utmMedium: "",
     utmCampaign: ""
   });
 
-  // Get UTM parameters from URL on component mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
@@ -83,7 +64,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
     }
   }, []);
 
-  // Update time spent every second
+
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -94,12 +75,12 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Track the last field the user interacted with
+
   const handleFieldFocus = (fieldName: string) => {
     setLastFieldSeen(fieldName);
   };
 
-  // Initialize react-hook-form with zod validation
+
   const form = useForm<ExtendedFormValues>({
     resolver: zodResolver(multiSelectVisitorFormSchema),
     defaultValues: {
@@ -108,8 +89,8 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       email: "",
       phone: "",
       reasons: "",
-      interests: [], // Initialize as empty array
-      preferences: [], // Initialize as empty array
+      interests: [], 
+      preferences: [],
       age: undefined,
       occupation: undefined,
       company: "Edpulse Education",
@@ -117,11 +98,8 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
     },
   });
 
-  // Send partial form data if the user leaves the page
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Only send partial submission if the form is not submitted successfully
-      // and they've started filling out the form
       if (!success && form.getValues().firstName) {
         sendPartialSubmission();
       }
@@ -134,30 +112,19 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
     };
   }, [success]);
 
-  // Send partial form data
   const sendPartialSubmission = async () => {
     try {
       const formData = form.getValues();
-
-      // Only send if at least first name is filled
       if (!formData.firstName) return;
-
-      // Add time tracking info and session info
       const partialData = {
         ...formData,
         timeSpent,
         lastFieldSeen,
         isPartial: true,
-
-        // Browser information
         userAgent: navigator.userAgent,
         referrer: document.referrer,
-
-        // UTM parameters
         ...utmParams
       };
-
-      // Send partial submission - using navigator.sendBeacon for reliability during page unload
       const blob = new Blob([JSON.stringify(partialData)], {
         type: 'application/json'
       });
@@ -167,48 +134,28 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       console.error('Error sending partial submission:', error);
     }
   };
-
-  // Handle form submission
   const onSubmit = async (data: ExtendedFormValues) => {
-    // Reset states
     setLoading(true);
     setSuccess(false);
     setError(null);
 
     try {
       console.log('Submitting form data:', data);
-
-      // Add time tracking data and session info
       const enrichedData = {
         ...data,
         timeSpent,
         lastFieldSeen,
-
-        // Browser information
         userAgent: navigator.userAgent,
         referrer: document.referrer,
-        ipAddress: null, // Will be determined server-side
-
-        // UTM parameters
+        ipAddress: null, 
         ...utmParams
       };
-
-      // Send to our API route
       const response = await axios.post('/api/pabbly', enrichedData);
-
       console.log('Form submission response:', response.data);
-
-      // Set success state
       setSuccess(true);
-
-      // Clear form
       form.reset();
-
-      // Reset time tracking
       startTimeRef.current = new Date();
       setTimeSpent(0);
-
-      // Call onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
       }
@@ -219,18 +166,13 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
 
       if (axios.isAxiosError(err)) {
         errorMessage = err.response?.data?.message || err.message;
-
-        // If the error is related to CORS, provide a more helpful message
         if (err.message.includes('CORS') || err.message.includes('Network Error')) {
           errorMessage = 'Cannot reach our service. This might be due to network issues.';
         }
       } else if (err instanceof Error) {
         errorMessage = err.message;
       }
-
       setError(errorMessage);
-
-      // Call onError callback if provided
       if (onError) {
         onError(errorMessage);
       }
@@ -239,7 +181,6 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
     }
   };
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -254,24 +195,9 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
     hidden: { opacity: 0, y: 5 },
     show: { opacity: 1, y: 0 }
   };
+ 
 
-  // Benefits list
-  const benefits = [
-    {
-      icon: <Sparkles className="h-4 w-4 text-blue-500" />,
-      text: "Access premium educational content"
-    },
-    {
-      icon: <Rocket className="h-4 w-4 text-purple-500" />,
-      text: "Accelerate your learning journey"
-    },
-    {
-      icon: <Lock className="h-4 w-4 text-amber-500" />,
-      text: "Secure and personalized experience"
-    }
-  ];
-
-  // Available options for interests and preferences
+  
   const interestOptions = Object.values(InterestType).map(value => ({
     id: value,
     label: value.replace(/_/g, ' ').toLowerCase()
@@ -288,7 +214,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
       .join(' ')
   }));
 
-  // Occupation options
+
   const occupationOptions = Object.values(Occupation);
 
   return (
@@ -657,7 +583,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
             />
           </motion.div>
 
-          {/* Submit Button */}
+        
           <motion.div variants={itemVariants} className="pt-2">
             <Button
               type="submit"
@@ -682,7 +608,7 @@ export default function MagnetForm({ onSuccess, onError }: MagnetFormProps) {
         </form>
       </Form>
 
-      {/* Animated error message */}
+     
       {error && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

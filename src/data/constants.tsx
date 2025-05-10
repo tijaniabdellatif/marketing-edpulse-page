@@ -13,7 +13,7 @@ import {
   MessageSquare,
   BookOpen,
   FileText,
-  Compass
+  Compass,Lock,Rocket
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/grid-skeleton';
 import { Avatar } from '@/components/ui/avatar';
@@ -52,13 +52,27 @@ export const steps: Step[] = [
 export const navItems = [
 
 
-  { name: "About", link: "#about", icon: "ℹ️" },              // Info
-  { name: "Services", link: "#services", icon: "🛠️" },         // Tools/Services
-  { name: "Testimonials", link: "#testimonials", icon: "💼" },           // Professionalism/Work   // Knowledge/Experience
-  { name: "Join us", link: "#joinus", icon: "📞" }             // Phone/Contact
-
+  { name: "About", link: "#about", icon: "ℹ️" },             
+  { name: "Services", link: "#services", icon: "🛠️" },         
+  { name: "Testimonials", link: "#testimonials", icon: "💼" },           
+  { name: "Join us", link: "#joinus", icon: "📞" }           
 
 ];
+
+export const  benefits = [
+    {
+      icon: <Sparkles className="h-4 w-4 text-blue-500" />,
+      text: "Access premium educational content"
+    },
+    {
+      icon: <Rocket className="h-4 w-4 text-purple-500" />,
+      text: "Accelerate your learning journey"
+    },
+    {
+      icon: <Lock className="h-4 w-4 text-amber-500" />,
+      text: "Secure and personalized experience"
+    }
+  ];
 
 export const features = [
   {

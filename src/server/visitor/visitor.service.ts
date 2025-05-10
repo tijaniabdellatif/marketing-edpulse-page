@@ -1,4 +1,3 @@
-// server/visitor/visitor.service.ts
 import { axiosService } from '@/server/services/axios-service';
 
 // Visitor data interface
@@ -16,7 +15,7 @@ export class VisitorService {
    */
   public static async submitVisitor(visitorData: IVisitor): Promise<any> {
     try {
-      // Send to main webhook (pabbly)
+      
       const response = await axiosService.sendToWebhook('pabbly', {
         event: 'VISITOR_SUBMISSION',
         data: visitorData,
@@ -35,7 +34,5 @@ export class VisitorService {
       };
     }
   }
-  
- 
  
 }

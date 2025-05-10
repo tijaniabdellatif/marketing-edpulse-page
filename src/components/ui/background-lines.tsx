@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 export const BackgroundLines = ({
   children,
@@ -38,34 +38,27 @@ const SVG = ({
     opacity?: number;
   };
 }) => {
-  // Generate angular paths for the entire viewport
+  
   const generateAngularPaths = (count: number) => {
     const paths = [];
     
     for (let i = 0; i < count; i++) {
-      // Start points distributed across the entire canvas
       let x = Math.random() * 1440;
       let y = Math.random() * 900;
-      
       let path = `M${x} ${y}`;
-      
-      // Create 3-5 segments with straight lines and angles
       const segments = Math.floor(Math.random() * 3) + 3;
       
       for (let j = 0; j < segments; j++) {
-        // Decide direction: horizontal or vertical movement
         const isHorizontal = Math.random() > 0.5;
-        
-        // Generate a segment length that ensures coverage of the viewport
         const length = Math.random() * 500 + 200;
         
         if (isHorizontal) {
           x += (Math.random() > 0.5 ? 1 : -1) * length;
-          // Keep x within extended bounds to ensure coverage
+          
           x = Math.max(-200, Math.min(x, 1640));
         } else {
           y += (Math.random() > 0.5 ? 1 : -1) * length;
-          // Keep y within extended bounds to ensure coverage
+
           y = Math.max(-200, Math.min(y, 1100));
         }
         
@@ -78,7 +71,6 @@ const SVG = ({
     return paths;
   };
 
-  // Updated colors from the Creative Ninja design
   const colors = [
     "var(--teal-primary)",     // #26A69A - Teal
     "var(--teal-light)",       // #4DB6AC - Light teal
@@ -93,14 +85,12 @@ const SVG = ({
   
   const lineCount = svgOptions?.lineCount || 30;
   const duration = svgOptions?.duration || 15;
-  // Get custom opacity or use lower default
-  const maxOpacity = svgOptions?.opacity || 0.25; // Lower opacity for subtle effect
+  const maxOpacity = svgOptions?.opacity || 0.25; 
   const paths = generateAngularPaths(lineCount);
-  
-  // Create staggered lines with different delays
+
   const createLines = () => {
     return paths.map((path, idx) => {
-      const delay = idx * 0.1; // Quick staggered start
+      const delay = idx * 0.1; 
       
       return (
         <motion.path
@@ -137,10 +127,8 @@ const SVG = ({
     });
   };
   
-  // Create second set of lines with slight variations
   const createAlternateLines = () => {
     return paths.slice(0, Math.floor(paths.length / 2)).map((path, idx) => {
-      // Create a slightly modified path for variation
       const modifiedPath = path.split(' ').map((part, i) => {
         if (i > 0 && !isNaN(parseFloat(part))) {
           return (parseFloat(part) + (Math.random() * 30 - 15)).toFixed(2);
@@ -148,8 +136,8 @@ const SVG = ({
         return part;
       }).join(' ');
       
-      const delay = idx * 0.1 + 1; // Slightly later staggered start
-      const lowerOpacity = maxOpacity * 0.8; // Even lower opacity for alternate lines
+      const delay = idx * 0.1 + 1; 
+      const lowerOpacity = maxOpacity * 0.8; 
       
       return (
         <motion.path

@@ -8,7 +8,7 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Define animation variants outside component to prevent re-creation
+
 const navbarVariants = {
   hidden: { opacity: 0, y: -100 },
   visible: { opacity: 1, y: 0 },
@@ -30,7 +30,7 @@ export const Navbar = ({
   const [lastScrollY, setLastScrollY] = useState(0);
   const [visible, setVisible] = useState(true);
   
-  // Use memoized handler to prevent re-creation on each render
+ 
   const handleScrollChange = useCallback((current: number | string) => {
     if (typeof current === "number") {
       const scrollY = window.scrollY;
@@ -54,7 +54,6 @@ export const Navbar = ({
 
   useMotionValueEvent(scrollYProgress, "change", handleScrollChange);
 
-  // Close mobile menu when screen resizes to desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 640 && mobileMenuOpen) {
@@ -120,7 +119,7 @@ export const Navbar = ({
           ))}
         </div>
 
-        {/* Empty div to balance the flex layout */}
+    
         <div className="hidden sm:block w-6"></div>
       </motion.div>
 
@@ -133,7 +132,6 @@ export const Navbar = ({
             exit={{ opacity: 0, y: -20 }}
             transition={{ 
               duration: 0.2,
-              // Use GPU acceleration
               type: "tween" 
             }}
             className="fixed inset-0 bg-[#9C62FF]/20 backdrop-blur-md z-[4999] sm:hidden pt-28 px-4 border-r border-[#9C62FF]/10"
@@ -145,8 +143,8 @@ export const Navbar = ({
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ 
                     duration: 0.3, 
-                    delay: idx * 0.05, // Reduced from 0.1 to 0.05
-                    type: "tween" // Using simpler animation type
+                    delay: idx * 0.05, 
+                    type: "tween" 
                   }}
                   key={`mobile-link-${idx}`}
                   href={navItem.link}

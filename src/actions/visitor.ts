@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function submitUserForm(formData: FormData) {
   try {
-    // Extract form data
+  
     const firstName = formData.get('firstName') as string;
     const lastName = formData.get('lastName') as string;
     const email = formData.get('email') as string || undefined;
@@ -17,7 +17,7 @@ export async function submitUserForm(formData: FormData) {
       };
     }
 
-    // Create user data object
+   
     const userData: IVisitor = {
       firstName,
       lastName,
@@ -26,10 +26,9 @@ export async function submitUserForm(formData: FormData) {
       message
     };
 
-    // Submit to webhook via service
+ 
     const result = await VisitorService.submitVisitor(userData);
-    
-    // Revalidate the form page
+  
     revalidatePath('/');
     
     return result;
