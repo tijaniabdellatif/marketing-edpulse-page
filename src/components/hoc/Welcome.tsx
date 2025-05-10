@@ -83,7 +83,7 @@ export function Welcome({ onComplete }: WelcomeProps) {
 
                         <div className="w-20 h-20 rounded-full bg-teal-primary flex items-center justify-center mx-auto shadow-md">
                           {(() => {
-                            const Icon = steps[currentStep].icon;
+                            const Icon = steps[currentStep]!.icon;
                             return <Icon className="w-10 h-10 text-white" />;
                           })()}
                         </div>
@@ -96,7 +96,7 @@ export function Welcome({ onComplete }: WelcomeProps) {
                         initial="hidden"
                         animate="show"
                       >
-                        {steps[currentStep].title}
+                        {steps[currentStep]!.title}
                       </motion.h1>
 
 
@@ -106,7 +106,7 @@ export function Welcome({ onComplete }: WelcomeProps) {
                         initial="hidden"
                         animate="show"
                       >
-                        {steps[currentStep].description}
+                        {steps[currentStep]!.description}
                       </motion.p>
                     </>
                   )}
