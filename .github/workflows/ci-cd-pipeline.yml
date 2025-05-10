@@ -94,6 +94,14 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          PABBLY_WEBHOOK_URL: ${{secrets.PABBLY_WEBHOOK_URL}}
+          EMAIL_HOST: ${{secrets.EMAIL_HOST}}
+          EMAIL_PORT: ${{secrets.EMAIL_PORT}}
+          EMAIL_SECURE: ${{secrets.EMAIL_SECURE}}
+          EMAIL_USER: ${{secrets.EMAIL_USER}}
+          EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
+          EMAIL_FROM: ${{secrets.EMAIL_FROM}}
+
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

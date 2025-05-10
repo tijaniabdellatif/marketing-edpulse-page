@@ -1,8 +1,9 @@
-// app/api/pabbly/route.ts
+// app/api/pabbly/partial/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 import { PabblyService } from '@/server/pabbly/pabbly.service';
+import { SubmissionStatus, InterestType, PreferenceType } from '@prisma/client';
 import { parseInterests, parsePreferences } from '@/lib/parser/parser';
-import { InterestType, PreferenceType } from '@prisma/client';
 
 /**
  * Parses user agent for browser, device type, and OS information
@@ -35,51 +36,52 @@ function parseUserAgent(userAgent?: string | null) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the request body
-    const body = await request.json();
+    // Get the request body as raw bytes first
+    const buffer = await request.arrayBuffer();
+    const data = JSON.parse(new TextDecoder().decode(buffer));
     
-    // Extract all form data
-    const { 
-      firstName, 
-      lastName, 
-      email, 
-      phone, 
+    // Extract form data
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
       age,
-      reasons, 
+      reasons,
+      occupation,
       interests,
       preferences,
-      occupation,
       company,
       department,
       timeSpent,
       lastFieldSeen,
-      userAgent: clientUserAgent,
-      referrer: clientReferrer
-    } = body;
+      userAgent,
+      referrer
+    } = data;
     
     // Validate required fields
-    if (!firstName || !lastName) {
+    if (!firstName) {
       return NextResponse.json(
-        { success: false, message: 'First name and last name are required' },
+        { success: false, message: 'First name is required' },
         { status: 400 }
       );
     }
     
     // Parse tracking information
-    const userAgent = clientUserAgent || request.headers.get('user-agent');
-    const referrer = clientReferrer || request.headers.get('referer');
+    const realUserAgent = userAgent || request.headers.get('user-agent');
+    const realReferrer = referrer || request.headers.get('referer');
     const ipAddress = request.headers.get('x-forwarded-for')?.split(',')[0] || 
                       request.headers.get('x-real-ip') || 
                       '127.0.0.1';
-    const { browser, deviceType, os } = parseUserAgent(userAgent);
+    const { browser, deviceType, os } = parseUserAgent(realUserAgent);
     
     // Parse UTM parameters from URL
     const url = new URL(request.url);
-    const utmSource = url.searchParams.get('utm_source') || body.utmSource || null;
-    const utmMedium = url.searchParams.get('utm_medium') || body.utmMedium || null;
-    const utmCampaign = url.searchParams.get('utm_campaign') || body.utmCampaign || null;
+    const utmSource = url.searchParams.get('utm_source') || data.utmSource || null;
+    const utmMedium = url.searchParams.get('utm_medium') || data.utmMedium || null;
+    const utmCampaign = url.searchParams.get('utm_campaign') || data.utmCampaign || null;
     
-    // Parse interests and preferences if provided
+    // Parse interests and preferences if present
     // Make sure to handle the case where interests might be an array or object instead of a string
     let parsedInterests:any[] = [];
     let parsedPreferences:any[] = [];
@@ -125,20 +127,21 @@ export async function POST(request: NextRequest) {
       // Form data
       interests: parsedInterests,
       preferences: parsedPreferences,
-      isPartial: false,
-      timeSpent: timeSpent || 0,
+      isPartial: true,
+      lastFieldSeen,
+      timeSpent,
       
       // Session data
       ipAddress,
-      userAgent,
-      referrer,
+      userAgent: realUserAgent,
+      referrer: realReferrer,
       utmSource,
       utmMedium,
       utmCampaign
     });
     
     if (!result.success) {
-      console.error('Error processing form submission:', result.error);
+      console.error('Error processing partial form submission:', result.error);
       
       return NextResponse.json(
         {
@@ -149,25 +152,21 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Return success response
+    // For beacon API, return successful response
     return NextResponse.json({
       success: true,
-      message: 'Data sent to Pabbly successfully',
+      message: 'Partial form data saved successfully',
       visitorId: result.visitor?.id
     });
   } catch (error) {
-    console.error('Error sending data to Pabbly:', error);
+    console.error('Error processing partial form submission:', error);
     
     // Format the error message
-    let errorMessage = 'Failed to send data to Pabbly';
+    let errorMessage = 'Failed to process partial form submission';
     let errorStatus = 500;
     
     if (error instanceof Error) {
       errorMessage = error.message;
-      // If the error message contains 'CORS' or 'Network Error', provide a more helpful message
-      if (errorMessage.includes('CORS') || errorMessage.includes('Network Error')) {
-        errorMessage = 'Cannot reach Pabbly service. This might be due to CORS restrictions or network issues.';
-      }
     }
     
     return NextResponse.json(

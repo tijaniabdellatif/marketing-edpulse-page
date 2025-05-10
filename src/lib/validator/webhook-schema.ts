@@ -1,39 +1,81 @@
-// lib/schemas/user-form-schema.ts
-import * as z from "zod";
+// lib/validator/webhook-schema.ts
 
-// Define form validation schema
+import * as z from "zod";
+import { InterestType, PreferenceType, Occupation } from "@prisma/client";
+
+// Base schema with string interests/preferences for backward compatibility
 export const visitorFormSchema = z.object({
-  firstName: z
-    .string()
-    .min(2, { message: "First name must be at least 2 characters" })
-    .max(50, { message: "First name must be less than 50 characters" }),
-  lastName: z
-    .string()
-    .min(2, { message: "Last name must be at least 2 characters" })
-    .max(50, { message: "Last name must be less than 50 characters" }),
-  email: z
-    .string()
-    .email({ message: "Please enter a valid email address" })
-    .optional()
-    .or(z.literal("")),
-  phone: z
-    .string()
-    .regex(/^\+?[0-9\s\-()]{7,20}$/, {
-      message: "Please enter a valid phone number",
-    })
-    .optional()
-    .or(z.literal("")),
-  reasons: z
-    .string()
-    .max(500, { message: "Message must be less than 500 characters" })
-    .optional()
-    .or(z.literal("")),
-  interests: z
-    .string()
-    .max(500, { message: "Message must be less than 500 characters" })
-    .optional()
-    .or(z.literal(""))
+  // Required fields
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  
+  // Optional fields
+  email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
+  age: z.number().positive("Age must be a positive number").optional(),
+  reasons: z.string().optional().or(z.literal("")),
+  
+  // Keep as string for backward compatibility
+  interests: z.string().optional().or(z.literal("")),
+  preferences: z.string().optional().or(z.literal("")),
+  
+  // Optional occupation from enum
+  occupation: z.nativeEnum(Occupation).optional(),
+  
+  // Company info
+  company: z.string().optional().or(z.literal("")),
+  department: z.string().optional().or(z.literal("")),
+  
+  // Form analytics - for internal use, not validated on client
+  timeSpent: z.number().optional(),
+  lastFieldSeen: z.string().optional(),
+  isPartial: z.boolean().optional(),
 });
 
-// Export type for the form values
 export type VisitorFormValues = z.infer<typeof visitorFormSchema>;
+
+// New schema with array interests/preferences for the multiple-choice UI
+export const multiSelectVisitorFormSchema = z.object({
+  // Required fields
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  
+  // Optional fields
+  email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
+  age: z.number().positive("Age must be a positive number").optional(),
+  reasons: z.string().optional().or(z.literal("")),
+  
+  // Array types for multiple choice
+  interests: z.array(z.nativeEnum(InterestType)).optional(),
+  preferences: z.array(z.nativeEnum(PreferenceType)).optional(),
+  
+  // Optional occupation from enum
+  occupation: z.nativeEnum(Occupation).optional(),
+  
+  // Company info
+  company: z.string().optional().or(z.literal("")),
+  department: z.string().optional().or(z.literal("")),
+  
+  // Form analytics - for internal use, not validated on client
+  timeSpent: z.number().optional(),
+  lastFieldSeen: z.string().optional(),
+  isPartial: z.boolean().optional(),
+});
+
+export type MultiSelectVisitorFormValues = z.infer<typeof multiSelectVisitorFormSchema>;
+
+// Extended form with analytics and session data that will be sent to the API
+export const extendedVisitorFormSchema = multiSelectVisitorFormSchema.extend({
+  // Session data
+  userAgent: z.string().optional(),
+  referrer: z.string().optional(),
+  ipAddress: z.string().optional().nullable(),
+  
+  // UTM parameters
+  utmSource: z.string().optional().nullable(),
+  utmMedium: z.string().optional().nullable(),
+  utmCampaign: z.string().optional().nullable(),
+});
+
+export type ExtendedVisitorFormValues = z.infer<typeof extendedVisitorFormSchema>;

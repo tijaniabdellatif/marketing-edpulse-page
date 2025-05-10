@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import prisma from '@/lib/prisma';
+import { EmailService } from '@/server/emails/email.service';
 import { 
   Visitor, 
   Session, 
@@ -13,14 +14,15 @@ import {
   Occupation,
   SubmissionStatus
 } from '@prisma/client';
+
 /**
  * Type for visitor with related models
  */
 type VisitorWithRelations = Visitor & {
   interests: Interest[];
   preferences: Preference[];
-  session?: Session;
-  submission?: FormSubmission;
+  sessions?: Session[];
+  submissions?: FormSubmission[];
 };
 
 /**
@@ -48,6 +50,8 @@ export class PabblyService {
         occupation,
         interests,
         preferences,
+        company,
+        department,
         isPartial = false,
         lastFieldSeen,
         timeSpent,
@@ -70,25 +74,52 @@ export class PabblyService {
         age: age ? parseInt(age) : undefined,
         reasons,
         occupation: occupation as Occupation,
+        company,
+        department,
         interests: interests as InterestType[],
         preferences: preferences as PreferenceType[]
       });
       
-      // Create session
-      const session = await prisma.session.create({
-        data: {
+      // Find existing session or create a new one
+      let session = await prisma.session.findFirst({
+        where: {
           visitorId: visitor.id,
-          ipAddress,
-          userAgent,
-          referrer,
-          utmSource,
-          utmMedium,
-          utmCampaign,
-          browser: this.getBrowserFromUserAgent(userAgent),
-          deviceType: this.getDeviceTypeFromUserAgent(userAgent),
-          os: this.getOSFromUserAgent(userAgent)
+          createdAt: {
+            // Find sessions created in the last 24 hours
+            gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+          }
         }
       });
+      
+      if (session) {
+        // Update existing session with new data
+        session = await prisma.session.update({
+          where: { id: session.id },
+          data: {
+            referrer: referrer || session.referrer,
+            utmSource: utmSource || session.utmSource,
+            utmMedium: utmMedium || session.utmMedium,
+            utmCampaign: utmCampaign || session.utmCampaign,
+            updatedAt: new Date()
+          }
+        });
+      } else {
+        // Create a new session if none exists
+        session = await prisma.session.create({
+          data: {
+            visitorId: visitor.id,
+            ipAddress,
+            userAgent,
+            referrer,
+            utmSource,
+            utmMedium,
+            utmCampaign,
+            browser: this.getBrowserFromUserAgent(userAgent),
+            deviceType: this.getDeviceTypeFromUserAgent(userAgent),
+            os: this.getOSFromUserAgent(userAgent)
+          }
+        });
+      }
       
       // Create form submission
       const submission = await prisma.formSubmission.create({
@@ -99,8 +130,8 @@ export class PabblyService {
           personalInfo: !!firstName && !!lastName,
           contactInfo: !!email || !!phone,
           reasonsInfo: !!reasons,
-          interestsInfo: !!interests && interests.length > 0,
-          preferencesInfo: !!preferences && preferences.length > 0,
+          interestsInfo: !!interests && (Array.isArray(interests) ? interests.length > 0 : !!interests),
+          preferencesInfo: !!preferences && (Array.isArray(preferences) ? preferences.length > 0 : !!preferences),
           lastFieldSeen: isPartial ? lastFieldSeen : undefined,
           timeSpent,
           submitTime: isPartial ? undefined : new Date()
@@ -131,10 +162,22 @@ export class PabblyService {
         include: {
           interests: true,
           preferences: true,
-          session: true,
-          submission: true
+          sessions: true,
+          submissions: true
         }
       }) as VisitorWithRelations;
+      
+      // Check if email is needed for missing preferences or interests
+      if (!isPartial && !submission.interestsInfo && !submission.preferencesInfo && email) {
+        // Only send email if this is a complete submission, not partial
+        // and if both interests and preferences are missing
+        this.sendMissingPreferencesEmail(
+          email, 
+          firstName, 
+          !submission.interestsInfo, 
+          !submission.preferencesInfo
+        );
+      }
       
       return {
         success: true,
@@ -160,6 +203,8 @@ export class PabblyService {
     age?: number;
     reasons?: string;
     occupation?: Occupation;
+    company?: string;
+    department?: string;
     interests?: InterestType[];
     preferences?: PreferenceType[];
   }): Promise<Visitor> {
@@ -171,6 +216,8 @@ export class PabblyService {
       age,
       reasons,
       occupation,
+      company,
+      department,
       interests,
       preferences
     } = data;
@@ -194,57 +241,83 @@ export class PabblyService {
           phone: phone || visitor.phone,
           age: age || visitor.age,
           reasons: reasons || visitor.reasons,
-          occupation: occupation || visitor.occupation
+          occupation: occupation || visitor.occupation,
+          company: company || visitor.company,
+          department: department || visitor.department
         }
       });
     } else {
       // Create new visitor
       visitor = await prisma.visitor.create({
         data: {
-          firstName,
-          lastName,
+          firstName:firstName!,
+          lastName:lastName!,
           email,
           phone,
           age,
           reasons,
-          occupation
+          occupation,
+          company,
+          department
         }
       });
     }
     
     // Process interests if provided
     if (interests && interests.length > 0) {
-      // Delete existing interests
-      await prisma.interest.deleteMany({
-        where: { visitorId: visitor.id }
-      });
-      
-      // Create new interests
-      for (const interest of interests) {
-        await prisma.interest.create({
-          data: {
-            visitorId: visitor.id,
-            type: interest
-          }
+      try {
+        // Delete existing interests
+        await prisma.interest.deleteMany({
+          where: { visitorId: visitor.id }
         });
+        
+        // Create new interests with proper type validation
+        for (const interest of interests) {
+          // Validate that interest is a valid enum value
+          if (Object.values(InterestType).includes(interest)) {
+            await prisma.interest.create({
+              data: {
+                visitorId: visitor.id,
+                type: interest,
+                updatedAt: new Date() // Explicitly set updatedAt
+              }
+            });
+          } else {
+            console.warn(`Skipping invalid interest type: ${interest}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error processing interests:', error);
+        // Continue execution even if interest processing fails
       }
     }
     
     // Process preferences if provided
     if (preferences && preferences.length > 0) {
-      // Delete existing preferences
-      await prisma.preference.deleteMany({
-        where: { visitorId: visitor.id }
-      });
-      
-      // Create new preferences
-      for (const preference of preferences) {
-        await prisma.preference.create({
-          data: {
-            visitorId: visitor.id,
-            type: preference
-          }
+      try {
+        // Delete existing preferences
+        await prisma.preference.deleteMany({
+          where: { visitorId: visitor.id }
         });
+        
+        // Create new preferences with proper type validation
+        for (const preference of preferences) {
+          // Validate that preference is a valid enum value
+          if (Object.values(PreferenceType).includes(preference)) {
+            await prisma.preference.create({
+              data: {
+                visitorId: visitor.id,
+                type: preference,
+                updatedAt: new Date() // Explicitly set updatedAt
+              }
+            });
+          } else {
+            console.warn(`Skipping invalid preference type: ${preference}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error processing preferences:', error);
+        // Continue execution even if preference processing fails
       }
     }
     
@@ -280,9 +353,56 @@ export class PabblyService {
     
     // Send to Pabbly
     console.log(`Sending ${isPartial ? 'partial' : 'complete'} submission to Pabbly:`, JSON.stringify(payload, null, 2));
-    const response = await axios.post(this.PABBLY_WEBHOOK_URL, payload);
     
-    return response.data;
+    try {
+      const response = await axios.post(this.PABBLY_WEBHOOK_URL, payload);
+      return response.data;
+    } catch (error) {
+      console.error('Error sending data to Pabbly:', error);
+      
+      // Return error information for debugging
+      if (axios.isAxiosError(error)) {
+        return {
+          error: true,
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data
+        };
+      }
+      
+      return {
+        error: true,
+        message: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Send email for missing preferences or interests
+   */
+  private static async sendMissingPreferencesEmail(
+    email: string,
+    firstName: string,
+    missingInterests: boolean,
+    missingPreferences: boolean
+  ): Promise<void> {
+    try {
+      // Send email
+      const result = await EmailService.sendPreferencesReminderEmail(
+        email,
+        firstName,
+        missingInterests,
+        missingPreferences
+      );
+
+      if (result) {
+        console.log(`Reminder email sent successfully to ${email}`);
+      } else {
+        console.warn(`Failed to send reminder email to ${email}`);
+      }
+    } catch (error) {
+      console.error('Error sending reminder email:', error);
+    }
   }
   
   /**
@@ -302,8 +422,8 @@ export class PabblyService {
       timestamp: new Date().toISOString(),
       
       // Company information
-      company: visitor.company,
-      department: visitor.department,
+      company: visitor.company || "EdPulse-Education",
+      department: visitor.department || "MARKETING",
       
       // Visitor information
       visitor: {
@@ -323,6 +443,7 @@ export class PabblyService {
       
       // Form analytics
       form_analytics: {
+        submission_id: submission.id,
         start_time: submission.startTime.toISOString(),
         submit_time: submission.submitTime?.toISOString(),
         time_spent_seconds: submission.timeSpent
@@ -330,6 +451,7 @@ export class PabblyService {
       
       // Session information
       session: {
+        id: session.id,
         referrer: session.referrer,
         
         // Device information
@@ -362,8 +484,8 @@ export class PabblyService {
       timestamp: new Date().toISOString(),
       
       // Company information
-      company: visitor.company,
-      department: visitor.department,
+      company: visitor.company || "EdPulse-Education",
+      department: visitor.department || "MARKETING",
       
       // Visitor information
       visitor: {
@@ -383,6 +505,7 @@ export class PabblyService {
       
       // Form analytics
       form_analytics: {
+        submission_id: submission.id,
         start_time: submission.startTime.toISOString(),
         dropout_time: submission.updatedAt.toISOString(),
         time_spent_seconds: submission.timeSpent,
@@ -398,6 +521,7 @@ export class PabblyService {
       
       // Session information
       session: {
+        id: session.id,
         referrer: session.referrer,
         
         // Device information

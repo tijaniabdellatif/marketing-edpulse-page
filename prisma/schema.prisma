@@ -13,151 +13,169 @@ datasource db {
 
 // ========== ENUMS ==========
 
-enum Occupation {
-  STUDENT
-  EMPLOYEE
-  FREELANCER
-  FREE_OF_FUNCTION
-}
-
 enum InterestType {
   GRAMMAR
   WRITING
+  SPEAKING
   LISTENING
-  PUBLIC_SPEAKING
+  READING
+  VOCABULARY
+  PRONUNCIATION
+  CULTURE
+  BUSINESS_ENGLISH
+  ACADEMIC_ENGLISH
+  TEST_PREPARATION
+  CONVERSATION
+  OTHER
 }
 
 enum PreferenceType {
-  ONLINE
+  VISUAL_LEARNING
+  AUDIO_LESSONS
+  GROUP_SESSIONS
+  ONE_ON_ONE
   SELF_PACED
-  WITH_INSTRUCTOR
+  STRUCTURED_COURSE
+  SHORT_LESSONS
+  IMMERSIVE
+  GAME_BASED
+  READING_BASED
+  WRITING_FOCUSED
+  SPEAKING_FOCUSED
+  OTHER
+}
+
+enum Occupation {
+  STUDENT
+  PROFESSIONAL
+  TEACHER
+  BUSINESS_OWNER
+  FREELANCER
+  RETIRED
+  HOMEMAKER
+  OTHER
 }
 
 enum SubmissionStatus {
-  PARTIAL      // User has partially completed the form
-  COMPLETED    // User has completed the form
+  COMPLETED
+  PARTIAL
+  ABANDONED
 }
 
-// ========== MODELS ==========
-
-// Main visitor model
 model Visitor {
-  id           String    @id @default(uuid())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id         String      @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String?     @unique
+  phone      String?
+  age        Int?
+  reasons    String?
+  occupation Occupation?
+  company    String?
+  department String?
+  summary    String?
 
-  // Basic information
-  firstName    String?
-  lastName     String?
-  email        String?
-  age          Int?
-  phone        String?
-  reasons      String?   // Why they're interested
-  occupation   Occupation?
+  // Relations
+  interests   Interest[]
+  preferences Preference[]
+  sessions    Session[]
+  submissions FormSubmission[]
 
-  // Company information - constants
-  company      String    @default("EdPulse-Education")
-  department   String    @default("MARKETING")
-
-  // Relationships
-  session      Session?
-  interests    Interest[]
-  preferences  Preference[]
-  submission   FormSubmission?
-  
-  @@index([email])
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-// Interest model
 model Interest {
-  id          String       @id @default(uuid())
-  createdAt   DateTime     @default(now())
-  type        InterestType
-  
-  // Relationship to visitor
-  visitorId   String
-  visitor     Visitor      @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  
-  @@unique([visitorId, type])
+  id        String       @id @default(uuid())
+  visitor   Visitor      @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+  type      InterestType
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   @@index([visitorId])
 }
 
-// Learning preference model
 model Preference {
-  id          String          @id @default(uuid())
-  createdAt   DateTime        @default(now())
-  type        PreferenceType
-  
-  // Relationship to visitor
-  visitorId   String
-  visitor     Visitor         @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  
-  @@unique([visitorId, type])
+  id        String         @id @default(uuid())
+  visitor   Visitor        @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+  type      PreferenceType
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   @@index([visitorId])
 }
 
-// Track visitor session (just for the landing page)
 model Session {
-  id           String    @id @default(uuid())
-  createdAt    DateTime  @default(now())
-  startTime    DateTime  @default(now())
-  
-  // Tracking information
-  ipAddress    String?
-  userAgent    String?
-  referrer     String?
-  utmSource    String?
-  utmMedium    String?
-  utmCampaign  String?
-  
-  // Browser and device info
-  browser      String?
-  deviceType   String?   // mobile, tablet, desktop
-  os           String?
-  
-  // Relationship to visitor
-  visitorId    String    @unique // One-to-one relationship
-  visitor      Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  
-  // Submission during this session
-  submission   FormSubmission?
-  
+  id        String  @id @default(uuid())
+  visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+
+  // Device info
+  ipAddress  String?
+  userAgent  String?
+  browser    String?
+  deviceType String?
+  os         String?
+
+  // Referrer
+  referrer String?
+
+  // UTM parameters
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  // Relations
+  submissions FormSubmission[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([visitorId])
 }
 
-// Track form submissions
 model FormSubmission {
-  id              String           @id @default(uuid())
-  createdAt       DateTime         @default(now())
-  status          SubmissionStatus
-  
-  // Form fields tracking
-  personalInfo    Boolean          @default(false) // First name, last name
-  contactInfo     Boolean          @default(false) // Email, phone
-  reasonsInfo     Boolean          @default(false) // Reasons field
-  interestsInfo   Boolean          @default(false) // Interests selected
-  preferencesInfo Boolean          @default(false) // Preferences selected
-  
+  id        String   @id @default(uuid())
+  visitor   Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+  session   Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  sessionId String?
+
+  // Submission status
+  status SubmissionStatus @default(PARTIAL)
+
+  // Form completion tracking
+  personalInfo    Boolean @default(false)
+  contactInfo     Boolean @default(false)
+  reasonsInfo     Boolean @default(false)
+  interestsInfo   Boolean @default(false)
+  preferencesInfo Boolean @default(false)
+
+  // Partial submission tracking
+  lastFieldSeen String?
+
   // Time tracking
-  startTime       DateTime         @default(now())
-  submitTime      DateTime?
-  timeSpent       Int?             // Time spent on form in seconds
-  
-  // Tracking for incomplete submissions
-  lastFieldSeen   String?
-  
-  // Relationships
-  visitorId       String           @unique // One-to-one relationship
-  visitor         Visitor          @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  sessionId       String           @unique // One-to-one relationship
-  session         Session          @relation(fields: [sessionId], references: [id])
-  
-  // Pabbly tracking
-  sentToPabbly    Boolean          @default(false)
-  pabblyResponse  String?          // Response from Pabbly webhook
-  pabblySentAt    DateTime?
-  
+  startTime  DateTime  @default(now())
+  submitTime DateTime?
+  timeSpent  Int? // In seconds
+
+  // Pabbly integration
+  sentToPabbly   Boolean   @default(false)
+  pabblyResponse String?
+  pabblySentAt   DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([visitorId])
   @@index([sessionId])
-  @@index([status])
 }
