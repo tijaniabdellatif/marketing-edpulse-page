@@ -1,4 +1,4 @@
-// lib/services/email.service.ts
+// lib/services/email.service.ts - MODIFIED VERSION
 
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
@@ -13,18 +13,34 @@ export interface EmailOptions {
 }
 
 export class EmailService {
-  private static transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.example.com',
-     port: parseInt(process.env.EMAIL_PORT || '587', 10),
-    secure: process.env.EMAIL_SECURE === 'true',
-    auth: {
-      user: process.env.EMAIL_USER || 'user@example.com',
-      pass: process.env.EMAIL_PASSWORD || 'password',
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
+  private static getTransporter() {
+    // Log config (for debugging)
+    console.log('Email service initializing with config:', {
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      secure: process.env.EMAIL_SECURE === 'true',
+      auth: {
+        user: process.env.EMAIL_USER ? '✓ Present' : '✗ Missing',
+        pass: process.env.EMAIL_PASSWORD ? '✓ Present' : '✗ Missing'
+      }
+    });
+    
+    // Create transporter with more Gmail-friendly settings
+    return nodemailer.createTransport({
+      host: process.env.EMAIL_HOST || 'smtp.example.com',
+      port: parseInt(process.env.EMAIL_PORT || '587', 10),
+      secure: process.env.EMAIL_SECURE === 'true',
+      auth: {
+        user: process.env.EMAIL_USER || 'user@example.com',
+        pass: process.env.EMAIL_PASSWORD || 'password',
+      },
+      tls: {
+        // For Gmail, we need different settings
+        rejectUnauthorized: true, // More secure for production
+        ciphers: 'SSLv3'
+      }
+    });
+  }
 
   private static defaultFromEmail = process.env.EMAIL_FROM || 'noreply@edpulse-education.com';
 
@@ -32,7 +48,13 @@ export class EmailService {
    * Send a general email
    */
   public static async sendEmail(options: EmailOptions): Promise<boolean> {
+    const transporter = this.getTransporter();
+    
     try {
+      // Verify connection before sending
+      await transporter.verify();
+      console.log(`SMTP connection verified successfully to ${process.env.EMAIL_HOST}`);
+      
       const { to, subject, html, from } = options;
 
       const mailOptions = {
@@ -42,24 +64,35 @@ export class EmailService {
         html,
       };
 
-      await this.transporter.sendMail(mailOptions);
-      console.log(`Email sent successfully to ${to}`);
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`Email sent successfully to ${to} (${info.messageId})`);
       return true;
     } catch (error) {
+      // Enhanced error logging
       console.error('Error sending email:', error);
+      if (error instanceof Error) {
+        console.error(`Error name: ${error.name}, message: ${error.message}`);
+        
+        // Log environment context for debugging
+        console.error('Environment context:', {
+          NODE_ENV: process.env.NODE_ENV,
+          isVercel: !!process.env.VERCEL,
+          email_host: process.env.EMAIL_HOST,
+          email_port: process.env.EMAIL_PORT
+        });
+      }
       return false;
     }
   }
 
-  /**
-   * Send a reminder email for missing preferences or topics
-   */
+  // Keep the rest of your methods unchanged
   public static async sendPreferencesReminderEmail(
     email: string,
     firstName: string,
     missingInterests: boolean,
     missingPreferences: boolean
   ): Promise<boolean> {
+    // Your existing implementation
     try {
       if (!email) {
         console.warn('Cannot send reminder email: no email address provided');
