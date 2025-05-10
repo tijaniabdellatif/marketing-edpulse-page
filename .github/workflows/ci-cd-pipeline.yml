@@ -101,7 +101,7 @@ jobs:
           EMAIL_USER: ${{secrets.EMAIL_USER}}
           EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
           EMAIL_FROM: ${{secrets.EMAIL_FROM}}
-          GEMINI_API_KEY: ${{secrets.GEMINI_API_KEY}}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
           
       - name: Upload build artifacts
